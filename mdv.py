@@ -79,7 +79,10 @@ is_app = 0
 if __name__ == '__main__':
     is_app = 1
     # Make Py2 > Py3:
-    reload(sys); sys.setdefaultencoding('utf-8')
+
+    if sys.version[0] == '2':
+        reload(sys)
+        sys.setdefaultencoding("utf-8")
     # no? see http://stackoverflow.com/a/29832646/4583360 ...
 
 # code analysis for hilite:
@@ -147,7 +150,7 @@ try:
     term_rows, term_columns = os.popen('stty size', 'r').read().split()
     term_columns, term_rows = int(term_columns), int(term_rows)
 except:
-    print '!! Could not derive your terminal width !!'
+    print('!! Could not derive your terminal width !!')
     term_columns = 80
     term_rows = 200
 
@@ -272,7 +275,7 @@ def style_ansi(raw_code, lang=None):
         try:
             lexer = get_lexer_by_name(lang)
         except ValueError:
-            print col(R, 'Lexer for %s not found' % lang)
+            print(col(R, 'Lexer for %s not found' % lang))
     lexer = None
     if not lexer:
         try:
@@ -711,12 +714,12 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     args = locals()
     if not md:
         if not filename:
-            print 'Using sample markdown:'
+            print('Using sample markdown:')
             make_sample()
             md = args['md'] = md_sample
-            print md
-            print
-            print 'Styling Result'
+            print(md)
+            print("")
+            print('Styling Result')
         else:
             with open(filename) as f:
                 md = f.read()
@@ -730,13 +733,13 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
             if not filename:
                 yl = 'You like *%s*, *%s*?' % (k, v['name'])
                 args['md'] = md_sample.replace(you_like, yl)
-            print col('%s%s%s' % ('\n\n', '=' * term_columns,'\n'), L)
+            print (col('%s%s%s' % ('\n\n', '=' * term_columns,'\n'), L))
             # should really create an iterator here:
             if theme == 'all':
                 args['theme'] = k
             else:
                 args['c_theme'] = k
-            print main(**args)
+            print (main(**args))
         return ''
 
     if cols:
@@ -768,7 +771,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     if c_theme or c_guess:
         # info:
         if not have_pygments:
-            print col('No pygments, can not analyze code for hilite', R)
+            print (col('No pygments, can not analyze code for hilite', R))
 
 
     # Create an instance of the Markdown class with the new extension
@@ -786,8 +789,8 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     except:
         if html:
             # can this happen? At least show:
-            print "we have markdown result but no ansi."
-            print html
+            print ("we have markdown result but no ansi.")
+            print (html)
         else:
             ansi = 'n.a. (no parsing result)'
 
@@ -846,7 +849,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 def monitor(args):
     """ file monitor mode """
     if not filename:
-        print col('Need file argument', 2)
+        print (col('Need file argument', 2))
         raise SystemExit
     last_err = ''
     last_stat = 0
@@ -858,20 +861,20 @@ def monitor(args):
                 stat = os.stat(filename)[8]
                 if stat != last_stat:
                     parsed = run_args(args)
-                    print parsed
+                    print (parsed)
                     last_stat = stat
                 last_err = ''
-            except Exception, ex:
+            except Exception as ex:
                 last_err = str(ex)
         if last_err:
-            print 'Error: %s' % last_err
+            print ('Error: %s' % last_err)
         sleep()
 
 def sleep():
     try:
         time.sleep(1)
-    except KeyboardInterrupt, ex:
-        print 'Have a nice day!'
+    except KeyboardInterrupt as ex:
+        print ('Have a nice day!')
         raise SystemExit
 
 
@@ -890,14 +893,14 @@ def run_changed_file_cmd(cmd, fp, pretty):
             cmd = cmd.replace(ph, '"%s"' % ph)
 
     cmd = cmd.replace(dir_mon_filepath_ph, fp)
-    print col('Running %s' % cmd, H1)
+    print(col('Running %s' % cmd, H1))
     for r, what in ((dir_mon_content_raw, raw),
                     (dir_mon_content_pretty, pretty)):
         cmd = cmd.replace(r, what.encode('base64'))
 
     # yeah, i know, sub bla bla...
     if os.system(cmd):
-        print col('(the command failed)', R)
+        print(col('(the command failed)', R))
 
 
 def monitor_dir(args):
@@ -906,8 +909,8 @@ def monitor_dir(args):
     def show_fp(fp):
         args['MDFILE'] = fp
         pretty = run_args(args)
-        print pretty
-        print "(%s)" % col(fp, L)
+        print(pretty)
+        print("(%s)" % col(fp, L))
         cmd = args.get('change_cmd')
         if cmd:
             run_changed_file_cmd(cmd, fp=fp, pretty=pretty)
@@ -923,7 +926,7 @@ def monitor_dir(args):
     d, exts = (d + ':md,mdown,markdown').split(':')[:2]
     exts = exts.split(',')
     if not os.path.exists(d):
-        print col('Does not exist: %s' % d, R)
+        print(col('Does not exist: %s' % d, R))
         sys.exit(2)
 
     dir_black_list = ['.', '..']
@@ -935,13 +938,13 @@ def monitor_dir(args):
 
         if len(ftree) > mon_max_files:
             # too deep:
-            print col('Max files (%s) reached' % c(mon_max_files, R))
+            print(col('Max files (%s) reached' % c(mon_max_files, R)))
             dir_black_list.append(d)
             return
         try:
             files = os.listdir(d)
-        except Exception, ex:
-            print '%s when scanning dir %s' % (col(ex, R), d)
+        except Exception as ex:
+            print('%s when scanning dir %s' % (col(ex, R), d))
             dir_black_list.append(d)
             return
 
@@ -983,7 +986,7 @@ def monitor_dir(args):
             if fp:
                 show_fp(fp)
             else:
-                print 'sth went wrong, no file found'
+                print('sth went wrong, no file found')
         sleep()
 
 
@@ -1008,6 +1011,6 @@ if __name__ == '__main__':
     if args.get('-M'):
         monitor_dir(args)
     else:
-        print run_args(args)
+        print(run_args(args))
 
 
