@@ -108,6 +108,11 @@ from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension, fenced_code
 from HTMLParser import HTMLParser
 
+# ---------------------------------------------------------------------- Logging
+import logging
+md_logger = logging.getLogger('MARKDOWN')
+md_logger.setLevel(logging.WARNING)
+
 # ---------------------------------------------------------------------- Config
 hr_sep, txt_block_cut, code_pref, list_pref, hr_ends = '─', '✂', '░ ', '- ', '◈'
 # ansi cols (default):
@@ -164,10 +169,6 @@ md_sample = ''
 # dir monitor recursion max:
 mon_max_files = 1000
 # ------------------------------------------------------------------ End Config
-
-import logging
-md_logger = logging.getLogger('MARKDOWN')
-md_logger.setLevel(logging.WARNING)
 
 
 # below here you have to *know* what u r doing... (since I didn't too much)
