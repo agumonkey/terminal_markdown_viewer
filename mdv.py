@@ -709,9 +709,7 @@ class AnsiPrintExtension(Extension):
 
 
 
-
-
-
+# ---------------------------------------------------------------------- Main
 def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
          c_no_guess=None, display_links=None, from_txt=None, do_html=None,
          no_colors=None, **kw):
