@@ -150,14 +150,19 @@ color = T
 
 show_links = None
 
+# default term dimensions
+term = {
+    'cols': 80,
+    'rows': 200,
+}
+
 # columns(!) - may be set to smaller width:
 try:
-    term_rows, term_columns = os.popen('stty size', 'r').read().split()
-    term_columns, term_rows = int(term_columns), int(term_rows)
+    r, c = list(map(int, os.popen('stty size').read().split()))
+    term['rows'] = r
+    term['cols'] = c
 except:
-    print('!! Could not derive your terminal width !!')
-    term_columns = 80
-    term_rows = 200
+    md_logger.warn('!! Could not derive your terminal width !!')
 
 # could be given, otherwise read from ansi_tables.json:
 themes = {}
@@ -402,8 +407,8 @@ def is_text_node(el):
 # ----------------------------------------------------- Text Termcols Adaptions
 def rewrap(el, t, ind, pref):
     """ Reasonably smart rewrapping checking punctuations """
-    global term_columns
-    cols = term_columns - len(ind + pref)
+    global term['cols']
+    cols = term['cols'] - len(ind + pref)
     if el.tag == 'code' or len(t) <= cols:
         return t
     # wrapping:
@@ -604,7 +609,7 @@ class AnsiPrinter(Treeprocessor):
                         t.append(row)
                         for cell in Row.getchildren():
                             row.append(fmt(cell, row))
-                cols = term_columns
+                cols = term['cols']
                 # good ansi handling:
                 tbl = tabulate(t)
 
@@ -690,7 +695,7 @@ def set_hr_widths(result):
         # (more indent = less '-'):
         hcl = clean_ansi(hr)
         ind = len(hcl) - len(hcl.split(hr_marker, 1)[1]) - 1
-        w = min(term_columns, mw) - 2 * ind
+        w = min(term['cols'], mw) - 2 * ind
         hrf = hr.replace(hr_marker, hr_sep * w)
         result = result.replace(hr, hrf)
     return result
@@ -725,7 +730,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
             with open(filename) as f:
                 md = f.read()
 
-    global term_columns
+    global term['cols']
     # style rolers requested?
     if c_theme == 'all' or theme == 'all':
         args.pop('kw')
@@ -734,7 +739,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
             if not filename:
                 yl = 'You like *%s*, *%s*?' % (k, v['name'])
                 args['md'] = md_sample.replace(you_like, yl)
-            print (col('%s%s%s' % ('\n\n', '=' * term_columns,'\n'), L))
+            print (col('%s%s%s' % ('\n\n', '=' * term['cols'],'\n'), L))
             # should really create an iterator here:
             if theme == 'all':
                 args['theme'] = k
@@ -744,7 +749,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         return ''
 
     if cols:
-        term_columns = int(cols)
+        term['cols'] = int(cols)
 
     global show_links
     show_links = display_links
@@ -824,7 +829,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         if not from_txt.split(':', 1)[0] in ansi:
             # display from top then:
             from_txt = ansi.strip()[1]
-        from_txt, mon_lines = (from_txt + ':%s' % (term_rows-6)).split(':')[:2]
+        from_txt, mon_lines = (from_txt + ':%s' % (term['rows']-6)).split(':')[:2]
         mon_lines = int(mon_lines)
         pre, post = ansi.split(from_txt, 1)
         post = '\n'.join(post.split('\n')[:mon_lines])
