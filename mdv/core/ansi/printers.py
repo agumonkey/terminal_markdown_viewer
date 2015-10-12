@@ -198,7 +198,7 @@ class AnsiPrinter(Treeprocessor):
         cols = self.term.cols
         if w <= cols:
             left = self.cnf.left_indent
-            ind = (cols - w) // 2 or hir
+            ind = hir or (cols - w) // 2
             indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
             out.extend(indl)
         else:
