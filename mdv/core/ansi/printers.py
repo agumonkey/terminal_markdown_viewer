@@ -18,6 +18,7 @@ class AnsiPrinter(Treeprocessor):
         self.scheme = scheme
         self.term = term
         self.cnf = cnf
+        self.tags = Tags(self.scheme, self.cnf)
 
         # a little preemptive checking for the future
         assert self.cnf.markers
@@ -38,7 +39,10 @@ class AnsiPrinter(Treeprocessor):
         out = '\n'.join(filter(Not(Eq(None)), flatten(out)))
         self.markdown.ansi = out
 
-    def formatter(self, el, hir=0, pref='', parent=None):
+    def f_hr(self, el, hir):
+        return [self.tags.hr('', hir=hir)]
+
+    def f_text(self, el, hir):
 
         def is_header(tag):
             return tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8')
