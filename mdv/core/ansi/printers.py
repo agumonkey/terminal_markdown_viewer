@@ -48,107 +48,102 @@ class AnsiPrinter(Treeprocessor):
             return tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8')
 
         M = self.cnf.markers
-        tags = Tags(self.scheme, self.cnf)
         out = []
-        done_inline = 0
+        el.text = el.text or ''
 
-# ----------------------------------------------------------------------- HR --
+        # <a attributes>foo... -> we want "foo....". Is it a sub
+        # tag or inline text?
+        done_inline, html = is_text_node(el)
 
-        if el.tag == 'hr':
-            return out.append(tags.hr('', hir=hir))
+        if done_inline:
+            t = html.rsplit('<', 1)[0]
+            t = t.replace('<code>', M['code_start']) \
+                 .replace('</code>', M['code_end'])
+            t = t.replace('<strong>', M['strong_start']) \
+                 .replace('</strong>', M['strong_end'])
+            t = t.replace('<em>', M['em_start']) \
+                 .replace('</em>', M['em_end'])
+            t = unescape(t)
+        else:
+            t = el.text
 
-# -------------------------------------------------------------------- P | Text
+        t = t.strip()
+        admon = ''
+        pref = body_pref = ''
+        if t.startswith('!!! '):
+            for k in self.cnf.admons:
+                if t[4:].startswith(k):
+                    pref = body_pref = '┃ '
+                    pref += (k.capitalize())
+                    admon = k
+                    t = t.split(k, 1)[1]
 
-        if el.text or el.tag == 'p':
-            el.text = el.text or ''
-            # <a attributes>foo... -> we want "foo....". Is it a sub
-            # tag or inline text?
-            done_inline, html = is_text_node(el)
+        # set the parent, e.g. nrs in ols:
+        if el.get('pref'):
+            # first line pref, like '-':
+            pref = el.get('pref')
+            # next line prefs:
+            body_pref = ' ' * len(pref)
+            el.set('pref', '')
 
-            if done_inline:
-                t = html.rsplit('<', 1)[0]
-                t = t.replace('<code>', M['code_start']) \
-                     .replace('</code>', M['code_end'])
-                t = t.replace('<strong>', M['strong_start']) \
-                     .replace('</strong>', M['strong_end'])
-                t = t.replace('<em>', M['em_start']) \
-                     .replace('</em>', M['em_end'])
-                t = unescape(t)
-            else:
-                t = el.text
+        ind = self.cnf.left_indent * hir
+        if is_header(el.tag):
+            # header level:
+            hl = int(el.tag[1:])
+            ind = ' ' * (hl - 1)
+            hir += hl
 
-            t = t.strip()
-            admon = ''
-            pref = body_pref = ''
-            if t.startswith('!!! '):
-                for k in self.cnf.admons:
-                    if t[4:].startswith(k):
-                        pref = body_pref = '┃ '
-                        pref += (k.capitalize())
-                        admon = k
-                        t = t.split(k, 1)[1]
-
-            # set the parent, e.g. nrs in ols:
-            if el.get('pref'):
-                # first line pref, like '-':
-                pref = el.get('pref')
-                # next line prefs:
-                body_pref = ' ' * len(pref)
-                el.set('pref', '')
-
-            ind = self.cnf.left_indent * hir
-            if is_header(el.tag):
-                # header level:
-                hl = int(el.tag[1:])
-                ind = ' ' * (hl - 1)
-                hir += hl
-
-            t = rewrap(el, t, ind, pref, self.term)
+        t = rewrap(el, t, ind, pref, self.term)
 
 # --------------------------------------------------------------- Text.Admon ..
 
-            # indent. can color the prefixes now, no more len checks:
-            if admon:
-                out.append('\n')
-                pref = col(pref, self.cnf.admons['H3'], self.cnf)
-                body_pref = col(body_pref, self.cnf.admons['H3'], self.cnf)
+        # indent. can color the prefixes now, no more len checks:
+        if admon:
+            out.append('\n')
+            pref = col(pref, self.cnf.admons['H3'], self.cnf)
+            body_pref = col(body_pref, self.cnf.admons['H3'], self.cnf)
 
-            if pref == self.cnf.icons['list_pref']:
-                pref = col(pref, self.scheme['H4'], self.cnf)
-            if pref.split('.', 1)[0].isdigit():
-                pref = col(pref, self.scheme['H3'], self.cnf)
+        if pref == self.cnf.icons['list_pref']:
+            pref = col(pref, self.scheme['H4'], self.cnf)
+        if pref.split('.', 1)[0].isdigit():
+            pref = col(pref, self.scheme['H3'], self.cnf)
 
-            t = ('\n' + ind + body_pref).join((t).splitlines())
-            t = ind + pref + t
+        t = ('\n' + ind + body_pref).join((t).splitlines())
+        t = ind + pref + t
 
-            # headers outer left: go sure.
-            # actually... NO. commented out.
-            # if is_header(el.tag):
-            #    pref = ''
+        # headers outer left: go sure.
+        # actually... NO. commented out.
+        # if is_header(el.tag):
+        #    pref = ''
 
-            # calling the class Tags functions (fallback on plain)
+        # calling the class Tags functions (fallback on plain)
+        plain_wrapper = lambda x, **kw: plain(x, self.cnf)
+        tag_formatter = getattr(self.tags, el.tag, plain_wrapper)
+        out.append(tag_formatter(t, hir=hir))
 
-            plain_wrapper = lambda x, **kw: plain(x, self.cnf)
-            tag_formatter = getattr(tags, el.tag, plain_wrapper)
-            out.append(tag_formatter(t, hir=hir))
+        if self.cnf.show_links:
+            for l in 'src', 'href':
+                if l in el.keys():
+                    out[-1] + low('(%s) ' % el.attrib.get(l, ''), self.cnf)
+                    # @WAT
 
-            if self.cnf.show_links:
-                for l in 'src', 'href':
-                    if l in el.keys():
-                        out[-1] + low('(%s) ' % el.attrib.get(l, ''), self.cnf)
-                        # @WAT
+        if admon:
+            out.append('\n')
 
-            if admon:
-                out.append('\n')
-
-            return out
+        return out
 
         # have children?
         #    nr for ols:
         if done_inline:
             return out
 
-# -------------------------------------------------------------------- Table ..
+    def formatter(self, el, hir=0, pref='', parent=None):
+
+        if el.tag == 'hr':
+            return self.f_hr(el, hir)
+
+        if el.text or el.tag == 'p':
+            return self.f_text(el, hir)
 
         if el.tag == 'table':
             return self.f_table(el, hir)
