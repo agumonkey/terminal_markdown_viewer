@@ -3,8 +3,6 @@ from markdown.extensions import Extension
 
 from vendor.tabulate import tabulate
 
-# from mdv.core.logger import warn
-
 from .base import col, low, plain, clean_ansi, rewrap
 from .tags import Tags, is_text_node
 
@@ -155,35 +153,6 @@ class AnsiPrinter(Treeprocessor):
             # python nested list, then tabulate spits
             # out ascii again:
 
-            # def fmt(cell, parent=None):
-            #     return '\n'.join(self.formatter(cell, 0, parent=parent))
-
-            # t = []
-            # for he_bo in 0, 1:
-            #     for Row in el[he_bo].getchildren():
-            #         row = []
-            #         t.append(row)
-            #         for cell in Row.getchildren():
-            #             row.append(fmt(cell, row))
-
-            # t = []
-            # for he_bo in 0, 1:
-            #     for Row in el[he_bo].getchildren():  # TR
-            #         row = []
-            #         for cell in Row.getchildren():   # TD
-            #             row.append(fmt(cell, row))
-            #         t.append(row)
-
-            # def old(el):
-            #     t = []
-            #     for he_bo in 0, 1:
-            #         for Row in el[he_bo].getchildren():
-            #             row = []
-            #             t.append(row)
-            #             for cell in Row.getchildren():
-            #                 row.append(fmt(cell, row))
-            #     return t
-
             # el = <table><thead>...</thead><tbody>...</tbody></table>
             #               `-> header        `-> body
             header, body = el
@@ -191,14 +160,6 @@ class AnsiPrinter(Treeprocessor):
             t = [[joinfmt(TD) for TD in TR.getchildren()]
                  for sub in (header, body)
                  for TR in sub.getchildren()]
-
-            # from pprint import pprint as pp
-            # print('DIFF')
-            # print('new')
-            # pp(t)
-            # print('old')
-            # pp(old(el))
-            # print('eq', t == old(el))  # True
 
             # good ansi handling:
             tbl = tabulate(t)
@@ -212,16 +173,8 @@ class AnsiPrinter(Treeprocessor):
             w = len(tbl.split('\n', 1)[0])
             cols = self.term.cols
             if w <= cols:
-                # # center:
-                # ind = (cols - w) / 2
-                # # too much:
-                # ind = hir  # @WAT
                 left = self.cnf.left_indent
                 ind = (cols - w) / 2 or hir
-                # tt = []
-                # for line in bordered(tbl.splitlines()):
-                #     tt.append('%s%s' % (ind * self.cnf.left_indent, line))
-                # out.extend(tt)
                 indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
                 out.extend(indl)
             else:
@@ -231,16 +184,6 @@ class AnsiPrinter(Treeprocessor):
                 # but len calcs are hart, since we are crammed with esc.
                 # seqs.
                 # -> get rid of them:
-
-                # tc = []
-                # for row in t:
-                #     tc.append([])
-                #     l = tc[-1]  # @WAAT
-                #     for cell in row:
-                #         l.append(clean_ansi(cell))
-                #         # again sam:
-                #         # note: we had to patch it, it inserted '\n'
-                #         # within cells!
 
                 tc = [[clean_ansi(cell) for cell in row] for row in t]
                 table = tabulate(tc)
@@ -261,7 +204,6 @@ class AnsiPrinter(Treeprocessor):
                 c.set('pref', str(nr) + ' ')
             # handle the ``` style unindented code blocks -> parsed as p:
             # is_code = None  # never used anywhere
-#            warn('[rec.children]', 'el', c, 'out', out, 'hir', hir, 'par', el)
             out.append(self.formatter(c, hir+1, parent=el))
 
         if el.tag == 'ul' or el.tag == 'ol' and not out[-1] == '\n':
