@@ -189,7 +189,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
     assert md
 
-# --------------------------------------------------------------------- Backend
+# ------------------------------------------------------------------- ANSI PASS
 
     global show_links
     show_links = display_links

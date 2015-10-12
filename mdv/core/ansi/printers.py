@@ -51,10 +51,14 @@ class AnsiPrinter(Treeprocessor):
 
         def is_text_node(el):
             # @TOFIX: use dom, not str.split ...
-            # @>>> e = lxml.etree.fromstring('<div><code>wt</code><pre>dh</pre></div>')
+            # s = '<div><code>wt</code><pre>dh</pre></div>'
+            # @>>> e = lxml.etree.fromstring(s)
             # <Element div at 0x7fb91f6e0e88>
             # @>>> e.getchildren()
-            # [<Element code at 0x7fb91ce7ae48>, <Element pre at 0x7fb91ea79b08>]
+            # [
+            #  <Element code at 0x7fb91ce7ae48>,
+            #  <Element pre at 0x7fb91ea79b08>
+            # ]
             # strip our tag:
             html = etree.tostring(el) \
                         .decode('utf8') \
@@ -122,8 +126,6 @@ class AnsiPrinter(Treeprocessor):
             hir += hl
 
         t = rewrap(el, t, ind, pref, self.term)
-
-# --------------------------------------------------------------- Text.Admon ..
 
         # indent. can color the prefixes now, no more len checks:
         if admon:
