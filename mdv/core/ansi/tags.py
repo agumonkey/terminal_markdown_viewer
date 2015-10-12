@@ -1,5 +1,3 @@
-from markdown.util import etree
-
 from mdv.core.ansi.base import col, low
 
 
@@ -42,29 +40,3 @@ class Tags:
         return low('\n%s%s%s%s%s\n' %
                    (ind, s, _.cnf.markers['hr_marker'], e, ind),
                    _.cnf)
-
-
-def is_text_node(el):
-    # @TOFIX: use dom, not str.split ...
-    # @>>> e = lxml.etree.fromstring('<div><code>wt</code><pre>dh</pre></div>')
-    # @>>> e
-    # <Element div at 0x7fb91f6e0e88>
-    # @>>> e.getchildren()
-    # [<Element code at 0x7fb91ce7ae48>, <Element pre at 0x7fb91ea79b08>]
-
-    # strip our tag:
-    html = etree.tostring(el) \
-                .decode('utf8') \
-                .split('<%s' % el.tag, 1)[1] \
-                .split('>', 1)[1] \
-                .rsplit('>', 1)[0]
-
-    # do we start with another tagged child which is NOT in inlines:?
-    if not html.startswith('<'):
-        return 1, html
-
-    inlines = ('<em>', '<code>', '<strong>')
-    for inline in inlines:
-        if html.startswith(inline):
-            return 1, html
-    return 0, 0

@@ -1,10 +1,12 @@
+import lxml.etree as etree
+
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 
 from vendor.tabulate import tabulate
 
 from .base import col, low, plain, clean_ansi, rewrap
-from .tags import Tags, is_text_node
+from .tags import Tags
 
 from mdv.core.helpers import unescape, flatten, Not, Eq
 
@@ -46,6 +48,27 @@ class AnsiPrinter(Treeprocessor):
 
         def is_header(tag):
             return tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8')
+
+        def is_text_node(el):
+            # @TOFIX: use dom, not str.split ...
+            # @>>> e = lxml.etree.fromstring('<div><code>wt</code><pre>dh</pre></div>')
+            # <Element div at 0x7fb91f6e0e88>
+            # @>>> e.getchildren()
+            # [<Element code at 0x7fb91ce7ae48>, <Element pre at 0x7fb91ea79b08>]
+            # strip our tag:
+            html = etree.tostring(el) \
+                        .decode('utf8') \
+                        .split('<%s' % el.tag, 1)[1] \
+                        .split('>', 1)[1] \
+                        .rsplit('>', 1)[0]
+            # do we start with another tagged child which is NOT in inlines:?
+            if not html.startswith('<'):
+                return True, html
+            inlines = ('<em>', '<code>', '<strong>')
+            for inline in inlines:
+                if html.startswith(inline):
+                    return True, html
+            return False, None
 
         M = self.cnf.markers
         out = []
