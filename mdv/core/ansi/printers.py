@@ -148,6 +148,16 @@ class AnsiPrinter(Treeprocessor):
         if el.tag == 'table':
             return self.f_table(el, hir)
 
+        # if el.tag in ('ul', 'li'):
+        #     c.set('pref', self.cnf.icons['list_pref'])
+        #     raise NotImplementedError
+
+        # if el.tag == 'ol':
+        #     nr = 0
+        #     nr += 1
+        #     c.set('pref', str(nr) + ' ')
+        #     raise NotImplementedError
+
         # UL | LI | OL 'list prefix style'
         #
         # UL | LI -> assign a list item prefix ('-' in config) as el.pref
