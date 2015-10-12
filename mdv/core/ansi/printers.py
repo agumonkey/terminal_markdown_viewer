@@ -1,5 +1,4 @@
-import lxml.etree as etree
-
+from markdown.util import etree
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 
