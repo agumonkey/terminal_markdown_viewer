@@ -1,0 +1,33 @@
+#+AUTHOR: Johan PONIN
+#+EMAIL: johan.ponin.pro@gmail.com
+
+* Interfaces
+
+  Term (os) { cols, rows }
+  Schemes { list, get }
+  AnsiPrinter (scheme) { ansi|tty|prn }
+  AnsiTreeProcessor (md) { run }
+
+* Passes
+  
+** MD markdown -> html
+
+** html -> md-css style
+
+   (scheme -> theme -> ...)
+
+   css subset applied on tree
+    - background-color
+    - font-color, font-weight, font-decoration
+    - margin, padding
+
+** md-css -> md-layout
+
+   (viewport) -> tree element dimensions
+
+   - width
+   - height
+
+** md-layout -> text
+
+   pretty-print the tree using per-element fields
