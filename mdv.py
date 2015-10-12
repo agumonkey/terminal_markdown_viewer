@@ -101,7 +101,8 @@ from mdv.core.term import Term
 from mdv.core.theme import Themes
 from mdv.core.code_formatter import CodeFormatter
 from mdv.core.ansi.base import col, clean_ansi
-from mdv.core.ansi.printers import AnsiPrintExtension  # , set_hr_widths
+from mdv.core.ansi.layout import set_hr_widths
+from mdv.core.ansi.printers import AnsiPrintExtension
 
 import config as cnf
 
@@ -266,7 +267,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         ansi = '\n(...)%s%s%s' % (
                '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
 
-    # ansi = set_hr_widths(ansi) + '\n' # TOFIX
+    ansi = set_hr_widths(ansi, term, cnf.icons, cnf.markers) + '\n'
     if no_colors:
         return clean_ansi(ansi)
     return ansi + '\n'

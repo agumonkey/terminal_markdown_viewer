@@ -4,7 +4,8 @@ from markdown.extensions import Extension
 
 from vendor.tabulate import tabulate
 
-from .base import col, low, plain, clean_ansi, rewrap
+from .base import col, low, plain, clean_ansi
+from .layout import rewrap
 from .tags import Tags
 
 from mdv.core.helpers import unescape, flatten, Not, Eq
