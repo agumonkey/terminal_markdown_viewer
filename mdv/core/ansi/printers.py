@@ -152,6 +152,7 @@ class AnsiPrinter(Treeprocessor):
         #
         # UL | LI -> assign a list item prefix ('-' in config) as el.pref
         # OL      -> assign accumulated number of OL `nr`      as el.pref
+        out = []
         nr = 0
         for c in el:
             if el.tag in ('ul', 'li'):
@@ -169,12 +170,13 @@ class AnsiPrinter(Treeprocessor):
         return out
 
     def f_table(self, el, hir):
-        out = []
         # processed all here, in one sweep:
         # markdown ext gave us a xml tree from the ascii,
         # our part here is the cell formatting and into a
         # python nested list, then tabulate spits
         # out ascii again:
+
+        # out = []
 
         # el = <table><thead>...</thead><tbody>...</tbody></table>
         #               `-> header        `-> body
@@ -199,7 +201,8 @@ class AnsiPrinter(Treeprocessor):
             left = self.cnf.left_indent
             ind = hir or (cols - w) // 2
             indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
-            out.extend(indl)
+            # out.extend(indl)
+            return indl
         else:
             # TABLE CUTTING WHEN NOT WIDTH FIT
             # oh snap, the table bigger than our screen. hmm.
@@ -210,8 +213,9 @@ class AnsiPrinter(Treeprocessor):
             tc = [[clean_ansi(cell) for cell in row] for row in t]
             table = tabulate(tc)
             rrrr = self.split_blocks(table, w, cols, part_fmter=bordered)
-            out.append(rrrr)
-        return out
+            # out.append(rrrr)
+            return rrrr
+        # return out
 
 # Then tell markdown about it
 
