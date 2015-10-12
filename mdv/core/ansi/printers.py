@@ -147,49 +147,7 @@ class AnsiPrinter(Treeprocessor):
 # -------------------------------------------------------------------- Table ..
 
         if el.tag == 'table':
-            # processed all here, in one sweep:
-            # markdown ext gave us a xml tree from the ascii,
-            # our part here is the cell formatting and into a
-            # python nested list, then tabulate spits
-            # out ascii again:
-
-            # el = <table><thead>...</thead><tbody>...</tbody></table>
-            #               `-> header        `-> body
-            header, body = el
-            joinfmt = lambda e: '\n'.join(self.formatter(e, 0))
-            t = [[joinfmt(TD) for TD in TR.getchildren()]
-                 for sub in (header, body)
-                 for TR in sub.getchildren()]
-
-            # good ansi handling:
-            tbl = tabulate(t)
-
-            def bordered(t):
-                t[0] = t[-1] = low(t[0].replace('-', '─'), self.cnf)
-                return t
-
-            # do we have right room to indent it?
-            # first line is seps, so no ansi esacapes foo:
-            w = len(tbl.split('\n', 1)[0])
-            cols = self.term.cols
-            if w <= cols:
-                left = self.cnf.left_indent
-                ind = (cols - w) / 2 or hir
-                indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
-                out.extend(indl)
-            else:
-                # TABLE CUTTING WHEN NOT WIDTH FIT
-                # oh snap, the table bigger than our screen. hmm.
-                # hey lets split into vertical parts:
-                # but len calcs are hart, since we are crammed with esc.
-                # seqs.
-                # -> get rid of them:
-
-                tc = [[clean_ansi(cell) for cell in row] for row in t]
-                table = tabulate(tc)
-                rrrr = self.split_blocks(table, w, cols, part_fmter=bordered)
-                out.append(rrrr)
-            return out
+            return self.f_table(el, hir)
 
         # UL | LI | OL 'list prefix style'
         #
@@ -211,6 +169,50 @@ class AnsiPrinter(Treeprocessor):
 
         return out
 
+    def f_table(self, el, hir):
+        out = []
+        # processed all here, in one sweep:
+        # markdown ext gave us a xml tree from the ascii,
+        # our part here is the cell formatting and into a
+        # python nested list, then tabulate spits
+        # out ascii again:
+
+        # el = <table><thead>...</thead><tbody>...</tbody></table>
+        #               `-> header        `-> body
+        header, body = el
+        joinfmt = lambda e: '\n'.join(self.formatter(e, 0))
+        t = [[joinfmt(TD) for TD in TR.getchildren()]
+             for sub in (header, body)
+             for TR in sub.getchildren()]
+
+        # good ansi handling:
+        tbl = tabulate(t)
+
+        def bordered(t):
+            t[0] = t[-1] = low(t[0].replace('-', '─'), self.cnf)
+            return t
+
+        # do we have right room to indent it?
+        # first line is seps, so no ansi esacapes foo:
+        w = len(tbl.split('\n', 1)[0])
+        cols = self.term.cols
+        if w <= cols:
+            left = self.cnf.left_indent
+            ind = (cols - w) // 2 or hir
+            indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
+            out.extend(indl)
+        else:
+            # TABLE CUTTING WHEN NOT WIDTH FIT
+            # oh snap, the table bigger than our screen. hmm.
+            # hey lets split into vertical parts:
+            # but len calcs are hart, since we are crammed with esc.
+            # seqs.
+            # -> get rid of them:
+            tc = [[clean_ansi(cell) for cell in row] for row in t]
+            table = tabulate(tc)
+            rrrr = self.split_blocks(table, w, cols, part_fmter=bordered)
+            out.append(rrrr)
+        return out
 
 # Then tell markdown about it
 
