@@ -76,21 +76,26 @@ class AnsiPrinter(Treeprocessor):
 
         # <a attributes>foo... -> we want "foo....". Is it a sub
         # tag or inline text?
+
+        def remove_markup(is_inline, html):
+            if done_inline:
+                t = html.rsplit('<', 1)[0]
+                t = t.replace('<code>', M['code_start']) \
+                     .replace('</code>', M['code_end'])
+                t = t.replace('<strong>', M['strong_start']) \
+                     .replace('</strong>', M['strong_end'])
+                t = t.replace('<em>', M['em_start']) \
+                     .replace('</em>', M['em_end'])
+                t = unescape(t)
+            else:
+                t = el.text
+            return t.strip()
+
         done_inline, html = is_text_node(el)
+        t = remove_markup(done_inline, html)
 
-        if done_inline:
-            t = html.rsplit('<', 1)[0]
-            t = t.replace('<code>', M['code_start']) \
-                 .replace('</code>', M['code_end'])
-            t = t.replace('<strong>', M['strong_start']) \
-                 .replace('</strong>', M['strong_end'])
-            t = t.replace('<em>', M['em_start']) \
-                 .replace('</em>', M['em_end'])
-            t = unescape(t)
-        else:
-            t = el.text
+        # ------------------------------------------------------- Text.Admon ..
 
-        t = t.strip()
         admon = ''
         pref = body_pref = ''
         if t.startswith('!!! '):
