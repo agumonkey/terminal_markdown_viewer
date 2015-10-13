@@ -232,25 +232,25 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # phs are numbered like this in the md, we replace back:
     stash = MD.htmlStash
     info('md.stash.rawHtmlBlocks:', len(stash.rawHtmlBlocks))
-    nr = -1
+    # nr = -1
 
-    CF = CodeFormatter(cnf)
-
-    for ph in stash.rawHtmlBlocks:
-        nr += 1
-        raw = unescape(ph[0])
-        pre = '<pre><code'
-        if raw.startswith(pre):
-            pre, raw = raw.split(pre, 1)
-            raw = raw.split('>', 1)[1].rsplit('</code>', 1)[0]
-            if 'class="' in pre:
-                # language:
-                lang = pre.split('class="', 1)[1].split('"')[0]
-            else:
-                lang = ''
-            raw = CF.code(raw.strip(), from_fenced_block=1, lang=lang)
-        ansi = ansi.replace(markdown.util.HTML_PLACEHOLDER % nr, raw)
     CF = CodeFormatter(cnf, themer)
+
+    for num, block in enumerate(stash.rawHtmlBlocks, 0):
+        # nr += 1
+        raw = unescape(block[0])
+        # thanks to: https://regex101.com/r/jZ7rZ1/1
+        rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
+        m = re.match(rx, raw, re.S)
+        mdv.debug('%s %s %s' % (raw, rx, m.groupdict() if m else None))
+
+        code = m.groupdict()['code']
+        lang = m.groupdict()['lang']
+        colored_code = CF.code(code, from_fenced_block=1, lang=lang)
+        assert colored_code
+        assert 'wzxhzdk:0' in ansi
+        ansi = ansi.replace(markdown.util.HTML_PLACEHOLDER % num, colored_code)
+        assert 'wzxhzdk:0' not in ansi
 
     # don't want these: gone through the extension now:
     # ansi = ansi.replace('```', '')
