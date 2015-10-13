@@ -202,12 +202,6 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # ------------------------------------------------------------------- ANSI PASS
 
-    global show_links
-    show_links = display_links
-
-    global guess_lexer
-    guess_lexer = not c_no_guess
-
     # html?
     the_html = MD.convert(md)
 

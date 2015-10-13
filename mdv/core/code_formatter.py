@@ -28,6 +28,7 @@ class CodeFormatter:
         try:
             if lang:
                 lexer = get_lexer_by_name(lang)
+            # @TOFIX, need to pass docopt c_no_guess
             elif self.cnf.guess_lexer:
                 lexer = pyg_guess_lexer(raw_code)
         except ValueError:
