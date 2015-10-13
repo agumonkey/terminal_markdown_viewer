@@ -1,4 +1,3 @@
-from markdown.util import etree
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 
@@ -8,7 +7,7 @@ from .base import col, low, plain, clean_ansi
 from .layout import rewrap
 from .tags import Tags
 
-from mdv.core.helpers import unescape, flatten, Not, Eq
+from mdv.core.helpers import unescape, flatten, Not, Eq, innerhtml
 
 # ---------------------------------------------------- Create the treeprocessor
 
@@ -47,24 +46,11 @@ class AnsiPrinter(Treeprocessor):
     def f_text(self, el, hir):
 
         def is_text_node(el):
-            # @TOFIX: use dom, not str.split ...
-            # s = '<div><code>wt</code><pre>dh</pre></div>'
-            # @>>> e = lxml.etree.fromstring(s)
-            # <Element div at 0x7fb91f6e0e88>
-            # @>>> e.getchildren()
-            # [
-            #  <Element code at 0x7fb91ce7ae48>,
-            #  <Element pre at 0x7fb91ea79b08>
-            # ]
-            # strip our tag:
-            html = etree.tostring(el) \
-                        .decode('utf8') \
-                        .split('<%s' % el.tag, 1)[1] \
-                        .split('>', 1)[1] \
-                        .rsplit('>', 1)[0]
-            # do we start with another tagged child which is NOT in inlines:?
-            if not html.startswith('<'):
-                return True, html
+            '''
+            element with only '<em>', '<code>', '<strong>'
+            or plain text as element childs
+            '''
+            inner = innerhtml(el).decode('utf8')
             inlines = ('<em>', '<code>', '<strong>')
             for inline in inlines:
                 if html.startswith(inline):

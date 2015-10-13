@@ -1,7 +1,7 @@
 import os
 
 from functools import reduce
-
+from markdown.util import etree
 from mdv.core.version import VERSION
 if VERSION['MAJOR'] == '2':
     from HTMLParser import HTMLParser
@@ -59,3 +59,8 @@ def Not(f):
 
 def Eq(v):
     return lambda w: w is v
+
+
+def innerhtml(el):
+    cs = [etree.tostring(c) for c in el]
+    return (el.text or '').encode('utf8') + b''.join(cs)
