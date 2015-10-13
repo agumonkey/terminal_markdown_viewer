@@ -53,7 +53,7 @@ def split_blocks(text_block, w, cols, icons, scheme, part_fmter=None):
         def F(i, l):
             icon = icons['txt_block_cut']
             color = scheme['L']
-            r = ' ' + col(icon, color, no_reset=1) + line[i:i+scols]
+            r = ' ' + col(icon, color, no_reset=1) + l[i:i+scols]
             return r
 
         parts.extend([F(i, line) for i in range(cols, len(line), scols)])
