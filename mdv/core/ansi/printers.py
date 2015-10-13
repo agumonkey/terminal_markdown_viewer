@@ -21,6 +21,8 @@ class AnsiPrinter(Treeprocessor):
         self.cnf = cnf
         self.tags = Tags(self.scheme, self.cnf)
 
+        # @TOFIX ensure existence of defaults regardless
+        # of config.py existence
         # a little preemptive checking for the future
         assert self.cnf.markers
         assert self.cnf.show_links is None

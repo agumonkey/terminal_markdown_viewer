@@ -202,7 +202,6 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # ------------------------------------------------------------------- ANSI PASS
 
-    # html?
     the_html = MD.convert(md)
 
     mdv.debug('[html]')
@@ -265,7 +264,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         if not from_txt.split(':', 1)[0] in ansi:
             # display from top then:
             from_txt = ansi.strip()[1]
-        wat = (from_txt + ':' + (term.rows-6))
+        wat = (from_txt + ':' + (term.rows-6))  # @WAT
         from_txt, mon_lines = wat.split(':')[:2]
         mon_lines = int(mon_lines)
         pre, post = ansi.split(from_txt, 1)
@@ -274,6 +273,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
                '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
 
     ansi = set_hr_widths(ansi, term, cnf.icons, cnf.markers) + '\n'
+    # @TODO, try to avoid formatting and then unformatting u_u;
     if no_colors:
         return clean_ansi(ansi)
     return ansi + '\n'
@@ -311,6 +311,7 @@ if __name__ == '__main__':
     # else:
     #     print(run_args(args))
 
+    # @TOFIX, I still get logging levels backward it seems.
     level = {
         0: logging.INFO,
         1: logging.WARN,
