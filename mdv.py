@@ -250,6 +250,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
                 lang = ''
             raw = CF.code(raw.strip(), from_fenced_block=1, lang=lang)
         ansi = ansi.replace(markdown.util.HTML_PLACEHOLDER % nr, raw)
+    CF = CodeFormatter(cnf, themer)
 
     # don't want these: gone through the extension now:
     # ansi = ansi.replace('```', '')
