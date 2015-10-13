@@ -46,9 +46,6 @@ class AnsiPrinter(Treeprocessor):
 
     def f_text(self, el, hir):
 
-        def is_header(tag):
-            return tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8')
-
         def is_text_node(el):
             # @TOFIX: use dom, not str.split ...
             # s = '<div><code>wt</code><pre>dh</pre></div>'
@@ -119,11 +116,6 @@ class AnsiPrinter(Treeprocessor):
             el.set('pref', '')
 
         ind = self.cnf.left_indent * hir
-        if is_header(el.tag):
-            # header level:
-            hl = int(el.tag[1:])
-            ind = ' ' * (hl - 1)
-            hir += hl
 
         t = rewrap(el, t, ind, pref, self.term)
 
@@ -167,6 +159,12 @@ class AnsiPrinter(Treeprocessor):
         if done_inline:
             return out
 
+    def f_headers(self, el, hir):
+        hl = int(el.tag[1:])  # hl <- 'H[0-9]>'
+        ind = ' ' * (hl - 1)
+        hir += hl
+        return rewrap(el, el.text, ind, el.get('pref'), self.term)
+
     def formatter(self, el, hir=0, pref='', parent=None):
 
         if el.tag == 'hr':
@@ -187,6 +185,8 @@ class AnsiPrinter(Treeprocessor):
         #     nr += 1
         #     c.set('pref', str(nr) + ' ')
         #     raise NotImplementedError
+        if el.tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8'):
+            return self.f_headers(el, hir)
 
         # UL | LI | OL 'list prefix style'
         #
