@@ -31,14 +31,15 @@ class AnsiPrinter(Treeprocessor):
         assert self.cnf.icons['list_pref']
 
     def run(self, doc):
-        out = self.formatter(doc)
-
         # formatter has issues
         #  - nested lists
         #  - empty (None) results
-        # @TOFIX
-        out = '\n'.join(filter(Not(Eq(None)), flatten(out)))
-        self.markdown.ansi = out
+        # @TOFIX, review logic, use clean in the mean time
+        def clean(tree):
+            return filter(Not(Eq(None)), flatten(tree))
+        formatted = self.formatter(doc)
+        cleaned = clean(formatted)
+        self.markdown.ansi = '\n'.join(cleaned)
 
     def f_hr(self, el, hir):
         return [self.tags.hr('', hir=hir)]
