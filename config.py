@@ -69,7 +69,7 @@ code_hl = derive(default_code, {
     "Number": 'CH4',
     "Operator": 'CH5',
     "Generic": 'CH2'
-})
+}, inclusive=False)
 
 admons = derive(default_text, {
     'note': 'H3',
