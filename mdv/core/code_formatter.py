@@ -17,22 +17,35 @@ class CodeFormatter:
 
     def style_ansi(self, raw_code, lang=None):
         """ actual code hilite """
-        lexer = 0
-        if lang:
-            try:
+
+        # lexer = 0
+        # if lang:
+        #     try:
+        #         lexer = get_lexer_by_name(lang)
+        #     except ValueError:
+        #         print(col(self.cnf.default_text['R'],
+        #                   'Lexer for %s not found' % lang))
+
+        # try:
+        #     if self.cnf.guess_lexer:
+        #         lexer = pyg_guess_lexer(raw_code)
+        # except:
+        #     lexer = get_lexer_by_name(self.cnf.def_lexer)
+
+        try:
+            if lang:
                 lexer = get_lexer_by_name(lang)
-            except ValueError:
-                print(col(self.cnf.default_text['R'],
-                          'Lexer for %s not found' % lang))
-        lexer = None
-        if not lexer:
-            try:
-                if self.cnf.guess_lexer:
-                    lexer = pyg_guess_lexer(raw_code)
-            except:
-                pass
-        if not lexer:
+            elif self.cnf.guess_lexer:
+                lexer = pyg_guess_lexer(raw_code)
+        except ValueError:
+            red = self.cnf.default_text['R']
+            err = 'Lexer for %s not found' % lang
+            print(col(red, err))
+        finally:
             lexer = get_lexer_by_name(self.cnf.def_lexer)
+
+        assert lexer, "Need a pygments lexer."
+
         tokens = lex(raw_code, lexer)
         cod = []
         for t, v in tokens:
