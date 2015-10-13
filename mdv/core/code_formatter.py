@@ -1,6 +1,7 @@
 # code analysis for hilite:
 try:
     from pygments import lex
+    from pygments import token
     from pygments.lexers import get_lexer_by_name
     from pygments.lexers import guess_lexer as pyg_guess_lexer
     have_pygments = True
@@ -12,8 +13,9 @@ from mdv.core.ansi.base import col, low
 
 class CodeFormatter:
 
-    def __init__(self, cnf):
+    def __init__(self, cnf, themer):
         self.cnf = cnf
+        self.themer = themer
 
     def style_ansi(self, raw_code, lang=None):
         """ actual code hilite """
@@ -59,6 +61,9 @@ class CodeFormatter:
         return ''.join(cod)
 
     def code(self, _, s, from_fenced_block=None, **kw):
+        hl = self.themer.hl(token)
+
+        assert hl, "Need hilite map."
         """ md code AND ``` style fenced raw code ends here"""
         lang = kw.get('lang')
 
