@@ -247,14 +247,14 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     CF = CodeFormatter(cnf, themer)
 
     for num, block in enumerate(stash.rawHtmlBlocks, 0):
-        raw = unescape(block[0])
+        raw = unescape(block[0])  # @WAT
         # thanks to: https://regex101.com/r/jZ7rZ1/1
         rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
         m = re.match(rx, raw, re.S)
         mdv.debug('%s %s %s' % (raw, rx, m.groupdict() if m else None))
 
-        code = m.groupdict()['code']
-        lang = m.groupdict()['lang']
+        code = m.groupdict().get('code')
+        lang = m.groupdict().get('lang')
         colored_code = CF.code(code, from_fenced_block=1, lang=lang)
 
         mdv.debug('[code.format] %s %s' % (num, markdown.util.HTML_PLACEHOLDER))
