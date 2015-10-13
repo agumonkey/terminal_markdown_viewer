@@ -112,11 +112,7 @@ import config as cnf
 
 
 def Logger():
-    # root_logger = logging.getLogger()
-    # root_logger.setLevel(logging.NOTSET)
-
     logging.getLogger().setLevel(logging.NOTSET)
-
     mdv = logging.getLogger('MDV')
     sh = logging.StreamHandler(stream=sys.stderr)
     sh.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
@@ -147,9 +143,8 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
     if not md:
         if not filename:
-            mdv.info('Using sample markdown')
+            mdv.info('Using generated markdown sample')
             md = make_sample(cnf.admons)
-            mdv.debug('>>> {md}'.format(md=md))
         else:
             with open(filename) as f:
                 md = f.read()
@@ -170,6 +165,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     #     background = BGL
     #     color = T
 
+    mdv.info('Theme selection: {theme}'.format(theme=theme))
     scheme = themer.get_theme(theme_selection=theme)
 
     if not c_theme:
@@ -182,13 +178,12 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         c_scheme = themer.get_theme(c_theme)
 
     if c_scheme or cnf.c_guess:
-        # info:
         if not have_pygments:
-            mdv.info(col('No pygments, can not analyze code for hilite',
-                         cnf.default_text['R']))
+            err = 'No pygments, can not analyze code for hilite'
+            mdv.info(col(err, cnf.default_text['R']))
 
     mdv.debug(themer)
-    mdv.debug(scheme)
+    mdv.debug('current scheme: {scheme}'.format(scheme=scheme))
 
     assert themer and scheme and c_scheme
 
@@ -347,4 +342,4 @@ if __name__ == '__main__':
     formatted = main(**kw)
     print(formatted)
 
-    mdv.info('done.')
+    mdv.info('Done.')
