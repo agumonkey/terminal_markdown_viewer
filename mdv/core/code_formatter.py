@@ -25,20 +25,6 @@ class CodeFormatter:
     def style_ansi(self, raw_code, lang=None):
         """ actual code hilite """
 
-        # lexer = 0
-        # if lang:
-        #     try:
-        #         lexer = get_lexer_by_name(lang)
-        #     except ValueError:
-        #         print(col(self.cnf.default_text['R'],
-        #                   'Lexer for %s not found' % lang))
-
-        # try:
-        #     if self.cnf.guess_lexer:
-        #         lexer = pyg_guess_lexer(raw_code)
-        # except:
-        #     lexer = get_lexer_by_name(self.cnf.def_lexer)
-
         try:
             if lang:
                 lexer = get_lexer_by_name(lang)
@@ -75,12 +61,6 @@ class CodeFormatter:
         # if from_fenced_block: ... WE treat equal.
 
         # shift to the far left, no matter the indent (screenspace matters):
-
-        # firstl = s.split('\n')[0]
-        # del_spaces = ' ' * (len(firstl) - len(firstl.lstrip()))
-        # s = ('\n' + s).replace('\n%s' % del_spaces, '\n')[1:]
-        # better expressed as re.sub('[\n\r][\s]+', '\n', ...)
-
         s = self.style_ansi(s, lang=lang) if have_pygments else s
         s = re.sub(r'[\n\r]\s+', '\n', s)
 
