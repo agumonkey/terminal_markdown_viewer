@@ -63,9 +63,7 @@ class CodeFormatter:
         """ md code AND ``` style fenced raw code ends here"""
         lang = kw.get('lang')
 
-        raw_code = s
-        if have_pygments:
-            s = self.style_ansi(raw_code, lang=lang)
+        # s = self.style_ansi(s, lang=lang) if have_pygments else s
 
         # outest hir is 2, use it for fenced:
         ind = ' ' * kw.get('hir', 2)
@@ -75,6 +73,7 @@ class CodeFormatter:
         firstl = s.split('\n')[0]
         del_spaces = ' ' * (len(firstl) - len(firstl.lstrip()))
         s = ('\n' + s).replace('\n%s' % del_spaces, '\n')[1:]
+        s = self.style_ansi(s, lang=lang) if have_pygments else s
 
         # we want an indent of one and low vis prefix. this does it:
         code_lines = ('\n' + s).splitlines()
