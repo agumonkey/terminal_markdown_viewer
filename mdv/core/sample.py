@@ -9,7 +9,10 @@ def make_sample(admons):
     headers = ['#' * hl + ' ' + 'Header %s' % hl for hl in range(1, 7)]
 
     this = open(__file__).read().split('"""', 3)[2].splitlines()[:10]
-    code = ['```python\n""" Test """{code}```'.format(code='\n'.join(this))]
+    code = ['''```python
+    """ Test """
+    {code}
+```'''.format(code='\n'.join(this))]
 
     table = ["""
 | Tables        | Fmt | Rest |
