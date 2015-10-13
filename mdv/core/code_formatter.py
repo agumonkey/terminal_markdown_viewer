@@ -80,9 +80,12 @@ class CodeFormatter:
         s = re.sub(r'[\n\r]\s+', '\n', s)
 
         # we want an indent of one and low vis prefix. this does it:
-        code_lines = ('\n' + s).splitlines()
-        prefix = ('\n%s%s %s' % (ind, low(self.cnf.code_pref),
-                                 col('', self.cnf.default_text['C'],
-                                     no_reset=1)))
-        code = prefix.join(code_lines)
-        return code + '\n' + self.cnf.reset_col
+        vis = low(self.cnf.icons['code_pref'], self.cnf)
+        pre = col('', self.cnf.default_text['C'], self.cnf, no_reset=1)
+        prefix = ('\n{ind}{vis} {pre}'.format(ind=ind, vis=vis, pre=pre))
+        code = prefix.join(s.splitlines())
+        fmt = '''
+        {code}
+        {reset}
+        '''
+        return fmt.format(code=code, reset=self.cnf.reset_col)
