@@ -25,7 +25,7 @@ class AnsiPrinter(Treeprocessor):
         # of config.py existence
         # a little preemptive checking for the future
         assert self.cnf.markers
-        assert self.cnf.show_links is None
+        assert self.cnf.show_links in (None, True)
         assert self.cnf.left_indent
         assert self.cnf.admons
         assert self.cnf.admons['H3']
