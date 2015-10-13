@@ -3,7 +3,7 @@
 
 """
 Usage:
-    mdv [-t THEME] [-T C_THEME] [-x] [-l] [-L] [-c COLS] [-f FROM] [-m] [-M DIR] [-H] [-A] [MDFILE]
+    mdv [-t THEME] [-T C_THEME] [-x] [-l] [-L] [-c COLS] [-f FROM] [-m] [-M DIR] [-H] [-A] [MDFILE] [-V] [-VV]
 
 Options:
     MDFILE    : Path to markdown file
@@ -18,6 +18,8 @@ Options:
     -c COLS   : Fix columns to this (default: your terminal width)
     -A        : Strip all ansi (no colors then)
     -H        : Print html version
+    -V        : Verbose mode
+    -VV       : Debug mode
 
 Notes:
 
@@ -94,7 +96,6 @@ from vendor.docopt import docopt
 
 from mdv.core.version import VERSION
 from mdv.core.helpers import j, unescape
-from mdv.core.logger import info, warn
 
 from mdv.core.sample import make_sample
 from mdv.core.term import Term
@@ -106,8 +107,23 @@ from mdv.core.ansi.printers import AnsiPrintExtension
 
 import config as cnf
 
-mdv_logger = logging.getLogger('MDV')
-mdv_logger.setLevel(logging.WARNING)
+# -------------------------------------------------------------------- Logging
+
+
+def Logger():
+    # root_logger = logging.getLogger()
+    # root_logger.setLevel(logging.NOTSET)
+
+    logging.getLogger().setLevel(logging.NOTSET)
+
+    mdv = logging.getLogger('MDV')
+    sh = logging.StreamHandler(stream=sys.stderr)
+    sh.setFormatter(logging.Formatter('[%(levelname)s] %(message)s'))
+    mdv.addHandler(sh)
+    mdv.setLevel(logging.INFO)
+    return mdv
+
+mdv = Logger()
 
 
 # ---------------------------------------------------------------------- Main
@@ -122,17 +138,17 @@ mdv_logger.setLevel(logging.WARNING)
 
 
 def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
-         c_no_guess=None, display_links=None, from_txt=None, do_html=None,
-         no_colors=None, **kw):
+        c_no_guess=None, display_links=None, from_txt=None, do_html=None,
+        no_colors=None, **kw):
     """ md is markdown string. alternatively we use filename and read """
 
 # --------------------------------------------------------------------- Loading
 
     if not md:
         if not filename:
-            print('Using sample markdown:')
+            mdv.info('Using sample markdown')
             md = make_sample(cnf.admons)
-            print('>>>', md)
+            mdv.debug('>>> {md}'.format(md=md))
         else:
             with open(filename) as f:
                 md = f.read()
@@ -140,7 +156,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # enforce desire column number from docopt args if present
     term = Term(cols) if cols else Term()
 
-    info(">>>", term)
+    mdv.debug(term)
     assert md and term
 
 # --------------------------------------------------------------------- Theming
@@ -167,11 +183,11 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     if c_scheme or cnf.c_guess:
         # info:
         if not have_pygments:
-            print(col('No pygments, can not analyze code for hilite',
-                      cnf.default_text['R']))
+            mdv.info(col('No pygments, can not analyze code for hilite',
+                         cnf.default_text['R']))
 
-    info('themer', themer)
-    info('scheme', scheme)
+    mdv.debug(themer)
+    mdv.debug(scheme)
 
     assert themer and scheme and c_scheme
 
@@ -183,9 +199,8 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
                                        TableExtension(),
                                        fenced_code.FencedCodeExtension()])
 
-    info('markdown.extensions', dir(MD))
-    info('markdown.treeprocessors', MD.treeprocessors)
-    print(' ---- ')
+    mdv.debug('markdown.extensions: {x}'.format(x=dir(MD)))
+    mdv.debug('markdown.treeprocessors: {x}'.format(x=MD.treeprocessors))
 
     assert md
 
@@ -200,9 +215,8 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # html?
     the_html = MD.convert(md)
 
-    print(' ---- ')
-    mdv_logger.info('[html]', the_html)
-    info('[html]', the_html)
+    mdv.debug('[html]')
+    mdv.debug(the_html)
 
     if do_html:
         return the_html
@@ -212,18 +226,19 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         ansi = MD.ansi
     except Exception as exn:
 
-        # mdv_logger.warn('[markdown.ansi]', exn)
-        warn('[markdown.ansi]', exn, dir(MD))
+        # mdv.warn('[markdown.ansi] {exn}'.format(exn=exn))
+        mdv.debug('[markdown.ansi] {exn} {md}'.format(exn=exn, md=dir(MD)))
 
         if do_html:
             # can this happen? At least show:
-            print("we have markdown result but no ansi.")
-            print(the_html)
+            mdv.debug("we have markdown result but no ansi.")
+            mdv.debug(the_html)
         else:
             ansi = 'n.a. (no parsing result)'
 
-    print(' ---- ')
-    info('[ansi]', ansi)
+    mdv.debug('[ansi]')
+    mdv.debug(ansi)
+
     assert ansi
 
 # -------------------------------------------------------------- Code Formatter
@@ -231,7 +246,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # The RAW html within source, incl. fenced code blocks:
     # phs are numbered like this in the md, we replace back:
     stash = MD.htmlStash
-    info('md.stash.rawHtmlBlocks:', len(stash.rawHtmlBlocks))
+    mdv.debug('md.stash.rawHtmlBlocks: {x}'.format(x=len(stash.rawHtmlBlocks)))
 
     CF = CodeFormatter(cnf, themer)
 
@@ -245,6 +260,10 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         code = m.groupdict()['code']
         lang = m.groupdict()['lang']
         colored_code = CF.code(code, from_fenced_block=1, lang=lang)
+
+        mdv.debug('[code.format] %s %s' % (num, markdown.util.HTML_PLACEHOLDER))
+        mdv.debug('[code.format][ansi.pre] %s' % ansi[250:300])
+
         assert colored_code
         ansi = ansi.replace(markdown.util.HTML_PLACEHOLDER % num, colored_code)
 
@@ -278,7 +297,7 @@ def demo(md, filename, theme, c_theme, themer, term, cnf):
             if not filename:
                 yl = 'You like *%s*, *%s*?' % (k, v['name'])
                 md = md.replace(cnf.you_like, yl)
-            print(col('%s%s%s' % ('\n\n', '=' * term.cols, '\n'), k['L']))
+            mdv.info(col('%s%s%s' % ('\n\n', '=' * term.cols, '\n'), k['L']))
             # should really create an iterator here:
             if theme == 'all':
                 args['theme'] = k
@@ -301,7 +320,16 @@ if __name__ == '__main__':
     #     monitor_dir(args)
     # else:
     #     print(run_args(args))
-    info('[docopts]', args)
+
+    level = {
+        0: logging.INFO,
+        1: logging.WARN,
+        2: logging.DEBUG,
+        3: logging.CRITICAL
+    }
+
+    mdv.setLevel(level.get(args.get('-V'), logging.INFO))
+    mdv.debug('[docopts] {args}'.format(args=args))
     kw = {
         'filename': args.get('MDFILE'),
         'theme': args.get('-t', 'random'),
@@ -313,8 +341,9 @@ if __name__ == '__main__':
         'no_colors': args.get('-A'),
         'display_links': args.get('-L')
     }
-    info('args -> kw', kw)
+    mdv.debug('[docopt] -> named dict: {kw}'.format(kw=kw))
 
     formatted = main(**kw)
     print(formatted)
 
+    mdv.info('done.')
