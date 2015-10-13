@@ -287,17 +287,13 @@ def demo(md, filename, theme, c_theme, themer, term, cnf):
             print(main(**args))
         return ''
 
-is_app = 0
 if __name__ == '__main__':
-    is_app = 1
-    # Make Py2 > Py3:
 
     if VERSION['MAJOR'] == '2':
         reload(sys)
         sys.setdefaultencoding("utf-8")
     # no? see http://stackoverflow.com/a/29832646/4583360 ...
 
-if __name__ == '__main__':
     args = docopt(__doc__, version='mdv v0.1')
     # if args.get('-m'):
     #     monitor(args)
