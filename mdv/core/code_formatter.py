@@ -70,10 +70,14 @@ class CodeFormatter:
         # if from_fenced_block: ... WE treat equal.
 
         # shift to the far left, no matter the indent (screenspace matters):
-        firstl = s.split('\n')[0]
-        del_spaces = ' ' * (len(firstl) - len(firstl.lstrip()))
-        s = ('\n' + s).replace('\n%s' % del_spaces, '\n')[1:]
+
+        # firstl = s.split('\n')[0]
+        # del_spaces = ' ' * (len(firstl) - len(firstl.lstrip()))
+        # s = ('\n' + s).replace('\n%s' % del_spaces, '\n')[1:]
+        # better expressed as re.sub('[\n\r][\s]+', '\n', ...)
+
         s = self.style_ansi(s, lang=lang) if have_pygments else s
+        s = re.sub(r'[\n\r]\s+', '\n', s)
 
         # we want an indent of one and low vis prefix. this does it:
         code_lines = ('\n' + s).splitlines()
