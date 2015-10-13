@@ -314,4 +314,7 @@ if __name__ == '__main__':
         'display_links': args.get('-L')
     }
     info('args -> kw', kw)
-    main(**kw)
+
+    formatted = main(**kw)
+    print(formatted)
+
