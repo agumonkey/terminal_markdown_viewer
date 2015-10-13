@@ -1,3 +1,4 @@
+import re
 # code analysis for hilite:
 try:
     from pygments import lex
