@@ -60,10 +60,10 @@ class CodeFormatter:
                 cod.append(v)
         return ''.join(cod)
 
-    def code(self, _, s, from_fenced_block=None, **kw):
         hl = self.themer.hl(token)
 
         assert hl, "Need hilite map."
+    def code(self, s, from_fenced_block=None, **kw):
         """ md code AND ``` style fenced raw code ends here"""
         lang = kw.get('lang')
 
