@@ -52,10 +52,12 @@ class AnsiPrinter(Treeprocessor):
             '''
             inner = innerhtml(el).decode('utf8')
             inlines = ('<em>', '<code>', '<strong>')
-            for inline in inlines:
-                if html.startswith(inline):
-                    return True, html
-            return False, None
+            is_inline = lambda s: any(s.startswith(tag) for tag in inlines)
+            # do we start with another tag not in inlines
+            if not inner.startswith('<') and not is_inline(inner):
+                return True, inner
+            else:
+                return False, None
 
         M = self.cnf.markers
         out = []
