@@ -76,6 +76,7 @@ Notes:
 
 from __future__ import print_function  # python 2 compatibility ...
 
+import re
 import sys
 
 import markdown
