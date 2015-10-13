@@ -176,15 +176,6 @@ class AnsiPrinter(Treeprocessor):
         if el.tag == 'table':
             return self.f_table(el, hir)
 
-        # if el.tag in ('ul', 'li'):
-        #     c.set('pref', self.cnf.icons['list_pref'])
-        #     raise NotImplementedError
-
-        # if el.tag == 'ol':
-        #     nr = 0
-        #     nr += 1
-        #     c.set('pref', str(nr) + ' ')
-        #     raise NotImplementedError
         if el.tag in ('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'h7', 'h8'):
             return self.f_headers(el, hir)
 
