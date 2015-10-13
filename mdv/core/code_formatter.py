@@ -1,4 +1,6 @@
 import re
+import logging
+
 # code analysis for hilite:
 try:
     from pygments import lex
@@ -10,6 +12,8 @@ except ImportError:
     have_pygments = False
 
 from mdv.core.ansi.base import col, low
+
+mdv = logging.getLogger("MDV")
 
 
 class CodeFormatter:

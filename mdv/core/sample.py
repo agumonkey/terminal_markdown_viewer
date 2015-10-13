@@ -2,6 +2,10 @@
 Generate a markdown sample.
 '''
 
+import logging
+
+mdv = logging.getLogger('MDV')
+
 
 def make_sample(admons):
     """ Generate the theme roller sample markdown """
@@ -26,5 +30,5 @@ def make_sample(admons):
     you_like = 'You like this theme?'
     like = ['\n----\n!!! question: %s' % you_like]
 
-    print('[warning]', 'uncomment the line below!')
+    mdv.debug('sample markdown generation: done')
     return '\n\n'.join(headers + code + table + admonitions + like)
