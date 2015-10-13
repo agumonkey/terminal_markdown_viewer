@@ -49,20 +49,16 @@ class CodeFormatter:
         assert lexer, "Need a pygments lexer."
 
         tokens = lex(raw_code, lexer)
-        cod = []
-        for t, v in tokens:
-            if not v:
-                continue
-            _col = self.cnf['code_hl_tokens'].get(t)
-            if _col:
-                cod.append(col(v, _col))
-            else:
-                cod.append(v)
-        return ''.join(cod)
-
         hl = self.themer.hl(token)
 
         assert hl, "Need hilite map."
+
+        def kol(t, v):
+            color = hl.get(t)
+            return col(v, color, self.cnf) if color else v
+
+        return ''.join([kol(t, v) for t, v in tokens if v])
+
     def code(self, s, from_fenced_block=None, **kw):
         """ md code AND ``` style fenced raw code ends here"""
         lang = kw.get('lang')
