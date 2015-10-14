@@ -13,6 +13,9 @@ class Term:
     def __str__(self, ):
         return '<Term {cols}:{rows}>'.format(cols=self.cols, rows=self.rows)
 
+    def dimensions(self):
+        return self.rows, self.cols
+
     def refresh(self):
         # columns(!) - may be set to smaller width:
         try:
