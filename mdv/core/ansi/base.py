@@ -6,10 +6,6 @@ def col(s, c, cnf, bg=0, no_reset=0):
     print col('foo', 124) -> red 'foo' on the terminal
     c = color, s the value to colorize """
 
-    reset = cnf.reset_col
-    if no_reset:
-        reset = ''
-
     M = cnf.markers
     marks = ((M['code_start'], M['code_end'], cnf.default_text['H2']),
              (M['strong_start'], M['strong_end'], cnf.default_text['H2']),
@@ -23,7 +19,7 @@ def col(s, c, cnf, bg=0, no_reset=0):
             s = s.replace(_strt, col('', _col, cnf, bg=DEFAULT_BG, no_reset=1))
             s = s.replace(_end, col('', c, cnf, no_reset=1))
 
-    s = '\033[38;5;%sm%s%s' % (c, s, reset)
+    s = '\033[38;5;%sm%s%s' % (c, s, '' if no_reset else cnf.reset_col)
     if bg:
         pass
     # s = col_bg(bg) + s
