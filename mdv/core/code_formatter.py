@@ -21,6 +21,7 @@ class CodeFormatter:
     def __init__(self, cnf, themer):
         self.cnf = cnf
         self.themer = themer
+        mdv.debug('code formatter loaded')
 
     def style_ansi(self, raw_code, lang=None):
         """ actual code hilite """
@@ -74,4 +75,5 @@ class CodeFormatter:
         {code}
         {reset}
         '''
+        mdv.debug('code formatting done')
         return fmt.format(code=code, reset=self.cnf.reset_col)
