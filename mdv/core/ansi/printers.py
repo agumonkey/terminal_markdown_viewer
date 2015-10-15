@@ -85,16 +85,19 @@ class AnsiPrinter(Treeprocessor):
         # <a attributes>foo... -> we want "foo....". Is it a sub
         # tag or inline text?
 
+        # Made remove_markup structurally similar to colorize_inline
         def remove_markup(is_inline, html, markers):
             M = markers
+            marks = (('<code>', M['code_start']),
+                     ('</code>', M['code_end']),
+                     ('<strong>', M['strong_start']),
+                     ('</strong>', M['strong_end']),
+                     ('<em>', M['em_start']),
+                     ('</em>', M['em_end']))
             if done_inline:
                 t = html.rsplit('<', 1)[0]
-                t = t.replace('<code>', M['code_start']) \
-                     .replace('</code>', M['code_end'])
-                t = t.replace('<strong>', M['strong_start']) \
-                     .replace('</strong>', M['strong_end'])
-                t = t.replace('<em>', M['em_start']) \
-                     .replace('</em>', M['em_end'])
+                for xml, asc in marks:
+                    t = t.replace(xml, asc)
                 t = unescape(t)
             else:
                 t = el.text
