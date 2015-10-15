@@ -90,13 +90,16 @@ class AnsiPrinter(Treeprocessor):
 
         admon = ''
         pref = body_pref = ''
-        if t.startswith('!!! '):
-            for k in self.cnf.admons:
-                if t[4:].startswith(k):
-                    pref = body_pref = '┃ '
-                    pref += (k.capitalize())
-                    admon = k
-                    t = t.split(k, 1)[1]
+
+        rx = '|'.join(self.cnf.admons.keys())
+        rx = re.compile('!!! (?P<admon>%s)(?P<text>.*)' % rx, re.DOTALL)
+        m = rx.match(t)
+        if m:
+            d = m.groupdict()
+            pref = body_pref = '┃ '
+            admon = d.get('admon')
+            pref += admon.capitalize()
+            t = d.get('text')
 
         # set the parent, e.g. nrs in ols:
         if el.get('pref'):
