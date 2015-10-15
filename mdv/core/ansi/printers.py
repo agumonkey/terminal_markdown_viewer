@@ -1,3 +1,5 @@
+import re
+
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 
@@ -62,29 +64,43 @@ class AnsiPrinter(Treeprocessor):
             else:
                 return False, None
 
-        M = self.cnf.markers
-        out = []
-        el.text = el.text or ''
+        # Inline colored elements now decoupled out of ansi.base.col()
+        # but .. the formatter rewrite html tags as arbitrary ASCII codes..
+        # then replaced by arbitrary associations between tags and scheme
+        # colors => @WAT
+        # Let's do it in one pass in the formatter.
 
-        # <a attributes>foo... -> we want "foo....". Is it a sub
-        # tag or inline text?
+        # def colorize_inline(s, cnf):
+        #     M = cnf.markers
+        #     BG = cnf.background
+        #     marks = ((M['code_start'], M['code_end'], cnf.default_text['H2']),
+        #              (M['strong_start'], M['strong_end'], cnf.default_text['H2']),
+        #              (M['em_start'], M['em_end'], cnf.default_text['H3']))
+        #     for beg, end, color in marks:
+        #         if beg in s:
+        #             # inline code:
+        #             s = s.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
+        #             s = s.replace(end, col('', color, cnf, no_reset=1))
 
-        def remove_markup(is_inline, html):
-            if done_inline:
+        def colorize_inline(is_inline, html, cnf):
+            bg = cnf.background
+            marks = (('<code>', '</code>', cnf.default_text['H2']),
+                     ('<strong>', '</strong>', cnf.default_text['H2']),
+                     ('<em>', '</em>', cnf.default_text['H3']))
+            if is_inline:
                 t = html.rsplit('<', 1)[0]
-                t = t.replace('<code>', M['code_start']) \
-                     .replace('</code>', M['code_end'])
-                t = t.replace('<strong>', M['strong_start']) \
-                     .replace('</strong>', M['strong_end'])
-                t = t.replace('<em>', M['em_start']) \
-                     .replace('</em>', M['em_end'])
+                for beg, end, color in marks:
+                    t = t.replace(beg, col('', color, cnf, bg=bg, no_reset=1))
+                    t = t.replace(end, col('', color, cnf, no_reset=1))
                 t = unescape(t)
             else:
                 t = el.text
             return t.strip()
 
+        el.text = el.text or ''
+
         done_inline, html = is_text_node(el)
-        t = remove_markup(done_inline, html)
+        t = colorize_inline(done_inline, html, self.cnf)
 
         # ------------------------------------------------------- Text.Admon ..
 
@@ -112,6 +128,7 @@ class AnsiPrinter(Treeprocessor):
         ind = self.cnf.left_indent * hir
 
         t = rewrap(el, t, ind, pref, self.term)
+        out = []
 
         # indent. can color the prefixes now, no more len checks:
         if admon:
@@ -124,13 +141,8 @@ class AnsiPrinter(Treeprocessor):
         if pref.split('.', 1)[0].isdigit():
             pref = col(pref, self.scheme['H3'], self.cnf)
 
-        t = ('\n' + ind + body_pref).join((t).splitlines())
+        t = ('\n' + ind + body_pref).join(t.splitlines())
         t = ind + pref + t
-
-        # headers outer left: go sure.
-        # actually... NO. commented out.
-        # if is_header(el.tag):
-        #    pref = ''
 
         # calling the class Tags functions (fallback on plain)
         plain_wrapper = lambda x, **kw: plain(x, self.cnf)
@@ -202,8 +214,6 @@ class AnsiPrinter(Treeprocessor):
         # python nested list, then tabulate spits
         # out ascii again:
 
-        # out = []
-
         # el = <table><thead>...</thead><tbody>...</tbody></table>
         #               `-> header        `-> body
         header, body = el
@@ -227,7 +237,6 @@ class AnsiPrinter(Treeprocessor):
             left = self.cnf.left_indent
             ind = hir or (cols - w) // 2
             indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
-            # out.extend(indl)
             return indl
         else:
             # TABLE CUTTING WHEN NOT WIDTH FIT
@@ -239,9 +248,7 @@ class AnsiPrinter(Treeprocessor):
             tc = [[clean_ansi(cell) for cell in row] for row in t]
             table = tabulate(tc)
             rrrr = self.split_blocks(table, w, cols, part_fmter=bordered)
-            # out.append(rrrr)
             return rrrr
-        # return out
 
 # Then tell markdown about it
 
