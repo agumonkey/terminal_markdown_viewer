@@ -62,6 +62,23 @@ class AnsiPrinter(Treeprocessor):
             else:
                 return False, None
 
+        # Inline colored elements now decoupled out of ansi.base.col()
+        # but .. the formatter rewrite html tags as arbitrary ASCII codes..
+        # then replaced by arbitrary associations between tags and scheme
+        # colors => @WAT
+        # Let's do it in one pass in the formatter.
+        def colorize_inline(s):
+            M = cnf.markers
+            DEFAULT_BG = cnf.background
+            marks = ((M['code_start'], M['code_end'], cnf.default_text['H2']),
+                     (M['strong_start'], M['strong_end'], cnf.default_text['H2']),
+                     (M['em_start'], M['em_end'], cnf.default_text['H3']))
+            for beg, end, color in marks:
+                if beg in s:
+                    # inline code:
+                    s = s.replace(beg, col('', color, cnf, bg=DEFAULT_BG, no_reset=1))
+                    s = s.replace(end, col('', c, cnf, no_reset=1))
+
         M = self.cnf.markers
         out = []
         el.text = el.text or ''
