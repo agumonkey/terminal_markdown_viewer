@@ -82,7 +82,7 @@ import logging
 import itertools as it
 
 import markdown
-import markdown.util
+from markdown.util import HTML_PLACEHOLDER
 from markdown.extensions import fenced_code
 from markdown.extensions.tables import TableExtension
 
@@ -261,11 +261,11 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         lang = m.groupdict().get('lang')
         colored_code = CF.code(code, from_fenced_block=1, lang=lang)
 
-        mdv.debug('[code.format] %s %s' % (num, markdown.util.HTML_PLACEHOLDER))
+        mdv.debug('[code.format] %s %s' % (num, HTML_PLACEHOLDER))
         mdv.debug('[code.format][ansi.pre] %s' % ansi[250:300])
 
         assert colored_code
-        ansi = ansi.replace(markdown.util.HTML_PLACEHOLDER % num, colored_code)
+        ansi = ansi.replace(HTML_PLACEHOLDER % num, colored_code)
 
     # don't want these: gone through the extension now:
     # ansi = ansi.replace('```', '')
