@@ -55,21 +55,15 @@ class CodeFormatter:
     def code(self, s, from_fenced_block=None, **kw):
         """ md code AND ``` style fenced raw code ends here"""
         lang = kw.get('lang')
+        hir = kw.get('hir', 2)  # outest hir is 2
 
-        # s = self.style_ansi(s, lang=lang) if have_pygments else s
-
-        # outest hir is 2, use it for fenced:
-        ind = ' ' * kw.get('hir', 2)
-        # if from_fenced_block: ... WE treat equal.
-
-        # shift to the far left, no matter the indent (screenspace matters):
         s = self.style_ansi(s, lang=lang) if have_pygments else s
         s = remove_left_indent(s)
 
         # we want an indent of one and low vis prefix. this does it:
         vis = low(self.cnf.icons['code_pref'], self.cnf)
         pre = col('', self.cnf.default_text['C'], self.cnf, no_reset=1)
-        prefix = ('\n{ind}{vis} {pre}'.format(ind=ind, vis=vis, pre=pre))
+        prefix = ('\n{ind}{vis} {pre}'.format(ind=' ' * hir, vis=vis, pre=pre))
         code = prefix.join(s.splitlines())
         fmt = '''
         {code}
