@@ -259,18 +259,62 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # don't want these: gone through the extension now:
     # ansi = ansi.replace('```', '')
 
+# ------------------------------------------------------------------------ Seek
+
+    # seek :: md.ansi -> string-to-match -> lines-after-match -> md.ansi'
+
+    def seek(md, position):
+        def parse(position):
+            '''@TOFIX, avoid parsing by using two docopt flags'''
+            fmt = '^(?P<match>[^:]+):(?P<lines>.*)$'
+            m = re.match(fmt, position)
+            if m:
+                d = m.groupdict()
+                match = d.get('match')
+                lines = int(d.get('lines'))
+                return True, match, lines
+            else:
+                err = 'position format should be `<string>:<lines>`, not {pos}'
+                mdv.warn(err.format(pos=position))
+                return False, None, None
+
+        check, match, lines = parse(position)
+        if not check:
+            return md
+        elif match in md:
+            # pos <- md.find match; md[pos+lines]
+            return 'md[match:match+lines]'
+        else:
+            return 'md[:lines]'
+
+        # if from_txt:
+        #     if not from_txt.split(':', 1)[0] in ansi:
+        #         # display from top then:
+        #         from_txt = ansi.strip()[1]
+        #     wat = (from_txt + ':' + (term.rows-6))  # @WAT
+        #     from_txt, mon_lines = wat.split(':')[:2]
+        #     mon_lines = int(mon_lines)
+        #     pre, post = ansi.split(from_txt, 1)
+        #     post = '\n'.join(post.split('\n')[:mon_lines])
+        #     ansi = '\n(...)%s%s%s' % (
+        #            '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
+        #     return "@@@"
+
+    mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
+    ansi = seek(ansi, from_txt) if from_txt else ansi
+
     # sub part display (the -f feature)
-    if from_txt:
-        if not from_txt.split(':', 1)[0] in ansi:
-            # display from top then:
-            from_txt = ansi.strip()[1]
-        wat = (from_txt + ':' + (term.rows-6))  # @WAT
-        from_txt, mon_lines = wat.split(':')[:2]
-        mon_lines = int(mon_lines)
-        pre, post = ansi.split(from_txt, 1)
-        post = '\n'.join(post.split('\n')[:mon_lines])
-        ansi = '\n(...)%s%s%s' % (
-               '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
+    # if from_txt:
+    #     if not from_txt.split(':', 1)[0] in ansi:
+    #         # display from top then:
+    #         from_txt = ansi.strip()[1]
+    #     wat = (from_txt + ':' + (term.rows-6))  # @WAT
+    #     from_txt, mon_lines = wat.split(':')[:2]
+    #     mon_lines = int(mon_lines)
+    #     pre, post = ansi.split(from_txt, 1)
+    #     post = '\n'.join(post.split('\n')[:mon_lines])
+    #     ansi = '\n(...)%s%s%s' % (
+    #            '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
 
     ansi = set_hr_widths(ansi, term, cnf.icons, cnf.markers) + '\n'
     # @TODO, try to avoid formatting and then unformatting u_u;
