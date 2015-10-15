@@ -67,44 +67,39 @@ class AnsiPrinter(Treeprocessor):
         # then replaced by arbitrary associations between tags and scheme
         # colors => @WAT
         # Let's do it in one pass in the formatter.
-        def colorize_inline(s, cnf):
-            M = cnf.markers
+
+        # def colorize_inline(s, cnf):
+        #     M = cnf.markers
+        #     BG = cnf.background
+        #     marks = ((M['code_start'], M['code_end'], cnf.default_text['H2']),
+        #              (M['strong_start'], M['strong_end'], cnf.default_text['H2']),
+        #              (M['em_start'], M['em_end'], cnf.default_text['H3']))
+        #     for beg, end, color in marks:
+        #         if beg in s:
+        #             # inline code:
+        #             s = s.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
+        #             s = s.replace(end, col('', color, cnf, no_reset=1))
+
+        def colorize_inline(is_inline, html, cnf):
             BG = cnf.background
-            marks = ((M['code_start'], M['code_end'], cnf.default_text['H2']),
-                     (M['strong_start'], M['strong_end'], cnf.default_text['H2']),
-                     (M['em_start'], M['em_end'], cnf.default_text['H3']))
-            for beg, end, color in marks:
-                if beg in s:
-                    # inline code:
-                    s = s.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
-                    s = s.replace(end, col('', color, cnf, no_reset=1))
-
-        out = []
-        el.text = el.text or ''
-
-        # <a attributes>foo... -> we want "foo....". Is it a sub
-        # tag or inline text?
-
-        # Made remove_markup structurally similar to colorize_inline
-        def remove_markup(is_inline, html, markers):
-            M = markers
-            marks = (('<code>', M['code_start']),
-                     ('</code>', M['code_end']),
-                     ('<strong>', M['strong_start']),
-                     ('</strong>', M['strong_end']),
-                     ('<em>', M['em_start']),
-                     ('</em>', M['em_end']))
-            if done_inline:
+            marks = (('<code>', '</code>', cnf.default_text['H2']),
+                     ('<strong>', '</strong>', cnf.default_text['H2']),
+                     ('<em>', '</em>', cnf.default_text['H3']))
+            if is_inline:
                 t = html.rsplit('<', 1)[0]
-                for xml, asc in marks:
-                    t = t.replace(xml, asc)
+                for beg, end, color in marks:
+                    t = t.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
+                    t = t.replace(end, col('', color, cnf, no_reset=1))
                 t = unescape(t)
             else:
                 t = el.text
             return t.strip()
 
+        out = []
+        el.text = el.text or ''
+
         done_inline, html = is_text_node(el)
-        t = remove_markup(done_inline, html, self.cnf.markers)
+        t = colorize_inline(done_inline, html, self.cnf)
 
         # ------------------------------------------------------- Text.Admon ..
 
