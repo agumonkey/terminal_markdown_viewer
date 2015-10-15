@@ -247,12 +247,14 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     #  - lift static code (rx regex) as constant
     #
 
+    # thanks to: https://regex101.com/r/jZ7rZ1/1
+    rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
+    rx = re.compile(rx, re.S)
+
     for num, (block, flag) in enumerate(stash.rawHtmlBlocks, 0):
         raw = unescape(block)
 
-        # thanks to: https://regex101.com/r/jZ7rZ1/1
-        rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
-        m = re.match(rx, raw, re.S)
+        m = re.match(rx, raw)
         mdv.debug('%s %s %s' % (raw, rx, m.groupdict() if m else None))
 
         code = m.groupdict().get('code')
