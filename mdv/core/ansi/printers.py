@@ -95,7 +95,6 @@ class AnsiPrinter(Treeprocessor):
                 t = el.text
             return t.strip()
 
-        out = []
         el.text = el.text or ''
 
         done_inline, html = is_text_node(el)
@@ -124,6 +123,7 @@ class AnsiPrinter(Treeprocessor):
         ind = self.cnf.left_indent * hir
 
         t = rewrap(el, t, ind, pref, self.term)
+        out = []
 
         # indent. can color the prefixes now, no more len checks:
         if admon:
