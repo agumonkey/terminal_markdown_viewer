@@ -264,6 +264,9 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     # seek :: md.ansi -> string-to-match -> lines-after-match -> md.ansi'
 
     def seek(md, position):
+        '''text -> (match:str, after:int) -> new text
+        seek for `match` in text, return md lines `after` that point
+        '''
         def parse(position):
             '''@TOFIX, avoid parsing by using two docopt flags'''
             fmt = '^(?P<match>[^:]+):(?P<lines>.*)$'
