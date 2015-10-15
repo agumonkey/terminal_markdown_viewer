@@ -81,14 +81,14 @@ class AnsiPrinter(Treeprocessor):
         #             s = s.replace(end, col('', color, cnf, no_reset=1))
 
         def colorize_inline(is_inline, html, cnf):
-            BG = cnf.background
+            bg = cnf.background
             marks = (('<code>', '</code>', cnf.default_text['H2']),
                      ('<strong>', '</strong>', cnf.default_text['H2']),
                      ('<em>', '</em>', cnf.default_text['H3']))
             if is_inline:
                 t = html.rsplit('<', 1)[0]
                 for beg, end, color in marks:
-                    t = t.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
+                    t = t.replace(beg, col('', color, cnf, bg=bg, no_reset=1))
                     t = t.replace(end, col('', color, cnf, no_reset=1))
                 t = unescape(t)
             else:
