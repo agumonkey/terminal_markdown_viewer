@@ -1,3 +1,5 @@
+import re
+
 from markdown.treeprocessors import Treeprocessor
 from markdown.extensions import Extension
 
