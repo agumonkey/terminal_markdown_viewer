@@ -6,15 +6,18 @@ def col(text, color, cnf, bg=0, no_reset=0):
     print col('foo', 124) -> red 'foo' on the terminal
     c = color, s the value to colorize
     """
-    reset = '' if no_reset else cnf.reset_col
-    s = '\033[38;5;{color}m{text}{reset}' \
-        .format(color=color, text=text, reset=reset)
-
-    # if bg:
-    #     pass
-    # s = col_bg(bg) + s
-
-    return s
+    if color:
+        reset = '' if no_reset else cnf.reset_col
+        # # if bg:
+        # #     pass
+        # # text = col_bg(bg) + text
+        # text = col_bg(bg) if bg else text
+        return '\033[38;5;{color}m{text}{reset}'.format(
+            color=color,
+            text=text,
+            reset=reset)
+    else:
+        return text
 
 
 def col_bg(c):
