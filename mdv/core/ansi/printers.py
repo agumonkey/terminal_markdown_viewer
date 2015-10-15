@@ -136,13 +136,8 @@ class AnsiPrinter(Treeprocessor):
         if pref.split('.', 1)[0].isdigit():
             pref = col(pref, self.scheme['H3'], self.cnf)
 
-        t = ('\n' + ind + body_pref).join((t).splitlines())
+        t = ('\n' + ind + body_pref).join(t.splitlines())
         t = ind + pref + t
-
-        # headers outer left: go sure.
-        # actually... NO. commented out.
-        # if is_header(el.tag):
-        #    pref = ''
 
         # calling the class Tags functions (fallback on plain)
         plain_wrapper = lambda x, **kw: plain(x, self.cnf)
