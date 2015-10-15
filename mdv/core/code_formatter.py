@@ -1,4 +1,3 @@
-import re
 import logging
 
 # code analysis for hilite:
@@ -12,6 +11,7 @@ except ImportError:
     have_pygments = False
 
 from mdv.core.ansi.base import col, low
+from mdv.core.ansi.helpers import remove_left_indent
 
 mdv = logging.getLogger("MDV")
 
@@ -64,7 +64,7 @@ class CodeFormatter:
 
         # shift to the far left, no matter the indent (screenspace matters):
         s = self.style_ansi(s, lang=lang) if have_pygments else s
-        s = re.sub(r'[\n\r]\s+', '\n', s)
+        s = remove_left_indent(s)
 
         # we want an indent of one and low vis prefix. this does it:
         vis = low(self.cnf.icons['code_pref'], self.cnf)

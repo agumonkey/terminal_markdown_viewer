@@ -1,4 +1,5 @@
 import os
+import re
 
 from functools import reduce
 from markdown.util import etree
@@ -64,3 +65,7 @@ def Eq(v):
 def innerhtml(el):
     cs = [etree.tostring(c) for c in el]
     return (el.text or '').encode('utf8') + b''.join(cs)
+
+
+def remove_left_indent(s):
+    return re.sub(r'[\n\r]\s+', '\n', s)
