@@ -232,6 +232,8 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # -------------------------------------------------------------- Code Formatter
 
+    # md.ansi -> code-formatter -> md.ansi'
+
     # The RAW html within source, incl. fenced code blocks:
     # phs are numbered like this in the md, we replace back:
     stash = MD.htmlStash
@@ -239,8 +241,15 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
     CF = CodeFormatter(cnf, themer)
 
-    for num, block in enumerate(stash.rawHtmlBlocks, 0):
-        raw = unescape(block[0])  # @WAT
+    #
+    # @TODO @NOW:
+    #  - shift loop logic into CodeFormatter
+    #  - lift static code (rx regex) as constant
+    #
+
+    for num, (block, flag) in enumerate(stash.rawHtmlBlocks, 0):
+        raw = unescape(block)
+
         # thanks to: https://regex101.com/r/jZ7rZ1/1
         rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
         m = re.match(rx, raw, re.S)
