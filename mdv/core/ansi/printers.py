@@ -79,14 +79,14 @@ class AnsiPrinter(Treeprocessor):
                     s = s.replace(beg, col('', color, cnf, bg=BG, no_reset=1))
                     s = s.replace(end, col('', color, cnf, no_reset=1))
 
-        M = self.cnf.markers
         out = []
         el.text = el.text or ''
 
         # <a attributes>foo... -> we want "foo....". Is it a sub
         # tag or inline text?
 
-        def remove_markup(is_inline, html):
+        def remove_markup(is_inline, html, markers):
+            M = markers
             if done_inline:
                 t = html.rsplit('<', 1)[0]
                 t = t.replace('<code>', M['code_start']) \
@@ -101,7 +101,7 @@ class AnsiPrinter(Treeprocessor):
             return t.strip()
 
         done_inline, html = is_text_node(el)
-        t = remove_markup(done_inline, html)
+        t = remove_markup(done_inline, html, self.cnf.markers)
 
         # ------------------------------------------------------- Text.Admon ..
 
