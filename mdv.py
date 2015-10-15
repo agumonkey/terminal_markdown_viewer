@@ -278,15 +278,19 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
                 mdv.warn(err.format(pos=position))
                 return False, None, None
 
-        check, match, lines = parse(position)
+        check, match, after = parse(position)
         if not check:
             return md
         elif match in md:
-            # pos <- md.find match; md[pos+lines]
-            return 'md[match:match+lines]'
+            #    dropwhile not(in(match)) md
+            # |> take after
+            lines = md.splitlines()
+            lines = it.dropwhile(lambda l: match not in l, lines)
+            lines = list(lines)[:after]
+            return '\n'.join(lines)
         else:
-            return 'md[:lines]'
-
+            lines = md.splitlines()[:after]
+            return '\n'.join(lines)
 
     mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
     ansi = seek(ansi, from_txt) if from_txt else ansi
