@@ -274,7 +274,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
                 lines = int(d.get('lines'))
                 return True, match, lines
             else:
-                err = 'position format should be `<string>:<lines>`, not {pos}'
+                err = 'position format must be `<string>:<lines>`, not `{pos}`'
                 mdv.warn(err.format(pos=position))
                 return False, None, None
 
