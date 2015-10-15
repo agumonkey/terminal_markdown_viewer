@@ -298,11 +298,13 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
     mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
     ansi = seek(ansi, from_txt) if from_txt else ansi
 
+# ------------------------------------------------------------------------ Wat?
 
     ansi = set_hr_widths(ansi, term, cnf.icons, cnf.markers) + '\n'
     # @TODO, try to avoid formatting and then unformatting u_u;
     if no_colors:
         return clean_ansi(ansi)
+
     return ansi + '\n'
 
 
