@@ -46,14 +46,6 @@ class CodeFormatter:
 
         assert hl, "Need hilite map."
 
-        # @WAT, this could and should be in ansi.base.col
-        # col s None -> s
-        # col s c -> ...
-        # def kol(t, v):
-        #     color = hl.get(t)
-        #     return col(v, color, self.cnf) if color else v
-
-        # return ''.join([kol(t, v) for t, v in tokens if v])
         return ''.join([col(s, hl.get(t)) for t, s in tokens if s])
 
     def code(self, s, from_fenced_block=None, **kw):
