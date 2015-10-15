@@ -213,8 +213,6 @@ class AnsiPrinter(Treeprocessor):
         # python nested list, then tabulate spits
         # out ascii again:
 
-        # out = []
-
         # el = <table><thead>...</thead><tbody>...</tbody></table>
         #               `-> header        `-> body
         header, body = el
@@ -238,7 +236,6 @@ class AnsiPrinter(Treeprocessor):
             left = self.cnf.left_indent
             ind = hir or (cols - w) // 2
             indl = [(ind * left) + l for l in bordered(tbl.splitlines())]
-            # out.extend(indl)
             return indl
         else:
             # TABLE CUTTING WHEN NOT WIDTH FIT
@@ -250,9 +247,7 @@ class AnsiPrinter(Treeprocessor):
             tc = [[clean_ansi(cell) for cell in row] for row in t]
             table = tabulate(tc)
             rrrr = self.split_blocks(table, w, cols, part_fmter=bordered)
-            # out.append(rrrr)
             return rrrr
-        # return out
 
 # Then tell markdown about it
 
