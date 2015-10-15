@@ -1,20 +1,25 @@
 import re
 
 
-def col(s, c, cnf, bg=0, no_reset=0):
+def col(text, color, cnf, bg=0, no_reset=0):
     """
     print col('foo', 124) -> red 'foo' on the terminal
-    c = color, s the value to colorize """
-    s = '\033[38;5;%sm%s%s' % (c, s, '' if no_reset else cnf.reset_col)
-    if bg:
-        pass
+    c = color, s the value to colorize
+    """
+    reset = '' if no_reset else cnf.reset_col
+    s = '\033[38;5;{color}m{text}{reset}' \
+        .format(color=color, text=text, reset=reset)
+
+    # if bg:
+    #     pass
     # s = col_bg(bg) + s
+
     return s
 
 
-# def col_bg(c):
-#     """ colorize background """
-#     return '\033[48;5;%sm' % c
+def col_bg(c):
+    """ colorize background """
+    return '\033[48;5;{bg}m'.format(bg=c)
 
 
 def low(s, cnf, **kw):
