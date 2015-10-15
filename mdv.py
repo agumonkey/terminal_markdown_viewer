@@ -287,34 +287,10 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
         else:
             return 'md[:lines]'
 
-        # if from_txt:
-        #     if not from_txt.split(':', 1)[0] in ansi:
-        #         # display from top then:
-        #         from_txt = ansi.strip()[1]
-        #     wat = (from_txt + ':' + (term.rows-6))  # @WAT
-        #     from_txt, mon_lines = wat.split(':')[:2]
-        #     mon_lines = int(mon_lines)
-        #     pre, post = ansi.split(from_txt, 1)
-        #     post = '\n'.join(post.split('\n')[:mon_lines])
-        #     ansi = '\n(...)%s%s%s' % (
-        #            '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
-        #     return "@@@"
 
     mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
     ansi = seek(ansi, from_txt) if from_txt else ansi
 
-    # sub part display (the -f feature)
-    # if from_txt:
-    #     if not from_txt.split(':', 1)[0] in ansi:
-    #         # display from top then:
-    #         from_txt = ansi.strip()[1]
-    #     wat = (from_txt + ':' + (term.rows-6))  # @WAT
-    #     from_txt, mon_lines = wat.split(':')[:2]
-    #     mon_lines = int(mon_lines)
-    #     pre, post = ansi.split(from_txt, 1)
-    #     post = '\n'.join(post.split('\n')[:mon_lines])
-    #     ansi = '\n(...)%s%s%s' % (
-    #            '\n'.join(pre.rsplit('\n', 2)[-2:]), from_txt, post)
 
     ansi = set_hr_widths(ansi, term, cnf.icons, cnf.markers) + '\n'
     # @TODO, try to avoid formatting and then unformatting u_u;
