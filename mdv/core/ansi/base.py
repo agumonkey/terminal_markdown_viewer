@@ -34,8 +34,8 @@ def plain(s, cnf, **kw):
 
 # ----------------------------------------------------- Text Termcols Adaptions
 
+ANSI_ESCAPE = re.compile(r'\x1b[^m]*m')
+
 
 def clean_ansi(s):
-    ansi_escape = re.compile(r'\x1b[^m]*m')
-    # if someone does not want the color foo:
-    return ansi_escape.sub('', s)
+    return ANSI_ESCAPE.sub('', s)
