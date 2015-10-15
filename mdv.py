@@ -78,10 +78,10 @@ from __future__ import print_function  # python 2 compatibility ...
 
 import re
 import sys
+import logging
+import itertools as it
 
 import markdown
-import logging
-
 import markdown.util
 from markdown.extensions import fenced_code
 from markdown.extensions.tables import TableExtension
