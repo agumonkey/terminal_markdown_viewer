@@ -82,7 +82,6 @@ import logging
 import itertools as it
 
 import markdown
-from markdown.util import HTML_PLACEHOLDER
 from markdown.extensions import fenced_code
 from markdown.extensions.tables import TableExtension
 
@@ -96,7 +95,7 @@ except ImportError:
 from vendor.docopt import docopt
 
 from mdv.core.version import VERSION
-from mdv.core.helpers import j, unescape
+from mdv.core.helpers import j
 
 from mdv.core.sample import make_sample
 from mdv.core.term import Term
@@ -234,38 +233,7 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
     # md.ansi -> code-formatter -> md.ansi'
 
-    # The RAW html within source, incl. fenced code blocks:
-    # phs are numbered like this in the md, we replace back:
-    stash = MD.htmlStash
-    mdv.debug('md.stash.rawHtmlBlocks: {x}'.format(x=len(stash.rawHtmlBlocks)))
-
-    CF = CodeFormatter(cnf, themer)
-
-    #
-    # @TODO @NOW:
-    #  - shift loop logic into CodeFormatter
-    #  - lift static code (rx regex) as constant
-    #
-
-    # thanks to: https://regex101.com/r/jZ7rZ1/1
-    rx = r'<pre><code +class="(?P<lang>[^"]+)" *>(?P<code>.*)</code>.*'
-    rx = re.compile(rx, re.S)
-
-    for num, (block, flag) in enumerate(stash.rawHtmlBlocks, 0):
-        raw = unescape(block)
-
-        m = re.match(rx, raw)
-        mdv.debug('%s %s %s' % (raw, rx, m.groupdict() if m else None))
-
-        code = m.groupdict().get('code')
-        lang = m.groupdict().get('lang')
-        colored_code = CF.code(code, from_fenced_block=1, lang=lang)
-
-        mdv.debug('[code.format] %s %s' % (num, HTML_PLACEHOLDER))
-        mdv.debug('[code.format][ansi.pre] %s' % ansi[250:300])
-
-        assert colored_code
-        ansi = ansi.replace(HTML_PLACEHOLDER % num, colored_code)
+    ansi = CodeFormatter(cnf, themer).reformat(MD)
 
     # don't want these: gone through the extension now:
     # ansi = ansi.replace('```', '')
