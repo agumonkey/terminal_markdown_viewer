@@ -240,11 +240,11 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # ------------------------------------------------------------------------ Seek
 
-    # seek :: md.ansi -> string-to-match -> lines-after-match -> md.ansi'
+    # seek :: text -> string-to-match -> lines-after-match -> text'
 
-    def seek(md, position):
+    def seek(text, position):
         '''text -> (match:str, after:int) -> new text
-        seek for `match` in text, return md lines `after` that point
+        seek for `match` in text, return text lines `after` that point
         '''
         def parse(position):
             '''@TOFIX, avoid parsing by using two docopt flags'''
@@ -262,16 +262,14 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
         check, match, after = parse(position)
         if not check:
-            return md
-        elif match in md:
-            #    dropwhile not(in(match)) md
-            # |> take after
-            lines = md.splitlines()
+            return text
+        elif match in text:
+            lines = text.splitlines()
             lines = it.dropwhile(lambda l: match not in l, lines)
             lines = list(lines)[:after]
             return '\n'.join(lines)
         else:
-            lines = md.splitlines()[:after]
+            lines = text.splitlines()[:after]
             return '\n'.join(lines)
 
     mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
