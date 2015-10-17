@@ -1,10 +1,9 @@
 import os
 import re
-
+import sys
 from functools import reduce
 from markdown.util import etree
-from mdv.core.version import VERSION
-if VERSION['MAJOR'] == '2':
+if sys.version_info.major == '2':
     from HTMLParser import HTMLParser
 else:
     from html.parser import HTMLParser

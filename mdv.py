@@ -94,7 +94,6 @@ except ImportError:
 
 from vendor.docopt import docopt
 
-from mdv.core.version import VERSION
 from mdv.core.helpers import j
 
 from mdv.core.sample import make_sample
@@ -304,7 +303,7 @@ def demo(md, filename, theme, c_theme, themer, term, cnf):
 
 if __name__ == '__main__':
 
-    if VERSION['MAJOR'] == '2':
+    if sys.version_info.major == 2:
         reload(sys)
         sys.setdefaultencoding("utf-8")
     # no? see http://stackoverflow.com/a/29832646/4583360 ...
