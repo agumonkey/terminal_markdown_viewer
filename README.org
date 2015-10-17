@@ -31,3 +31,25 @@
 ** md-layout -> text
 
    pretty-print the tree using per-element fields
+
+* TODO todos
+
+  find . -type d \( -path \*/SCCS -o -path \*/RCS -o -path \*/CVS -o -path \*/MCVS -o -path \*/.svn -o -path \*/.git -o -path \*/.hg -o -path \*/.bzr -o -path \*/_MTN -o -path \*/_darcs -o -path \*/\{arch\} \) -prune -o \! -type d \( -name .\#\* -o -name \*.cmti -o -name \*.cmt -o -name \*.annot -o -name \*.cmi -o -name \*.cmxa -o -name \*.cma -o -name \*.cmx -o -name \*.cmo -o -name \*.o -o -name \*\~ -o -name \*.bin -o -name \*.lbin -o -name \*.so -o -name \*.a -o -name \*.ln -o -name \*.blg -o -name \*.bbl -o -name \*.elc -o -name \*.lof -o -name \*.glo -o -name \*.idx -o -name \*.lot -o -name \*.fmt -o -name \*.tfm -o -name \*.class -o -name \*.fas -o -name \*.lib -o -name \*.mem -o -name \*.x86f -o -name \*.sparcf -o -name \*.dfsl -o -name \*.pfsl -o -name \*.d64fsl -o -name \*.p64fsl -o -name \*.lx64fsl -o -name \*.lx32fsl -o -name \*.dx64fsl -o -name \*.dx32fsl -o -name \*.fx64fsl -o -name \*.fx32fsl -o -name \*.sx64fsl -o -name \*.sx32fsl -o -name \*.wx64fsl -o -name \*.wx32fsl -o -name \*.fasl -o -name \*.ufsl -o -name \*.fsl -o -name \*.dxl -o -name \*.lo -o -name \*.la -o -name \*.gmo -o -name \*.mo -o -name \*.toc -o -name \*.aux -o -name \*.cp -o -name \*.fn -o -name \*.ky -o -name \*.pg -o -name \*.tp -o -name \*.vr -o -name \*.cps -o -name \*.fns -o -name \*.kys -o -name \*.pgs -o -name \*.tps -o -name \*.vrs -o -name \*.pyc -o -name \*.pyo \) -prune -o  -type f \( -name \*.py \) -exec grep  -nH -E -e \@\(TODO\|TOFIX\|WAT\) {} +
+  grep: warning: GREP_OPTIONS is deprecated; please use an alias or script
+  ./mdv/core/code_formatter.py:41:            # @TOFIX, need to pass docopt c_no_guess
+  ./mdv/core/ansi/layout.py:5:    # @TODO set_hr_widths may be a method in CodeFormatter
+  ./mdv/core/ansi/printers.py:26:        # @TOFIX ensure existence of defaults regardless
+  ./mdv/core/ansi/printers.py:41:        # @TOFIX, review logic, use clean in the mean time
+  ./mdv/core/ansi/printers.py:138:                    # @WAT
+  ./mdv/core/ansi/printers.py:147:        # @WAT, dangling dead code..
+  ./mdv.py:248:            '''@TOFIX, avoid parsing by using two docopt flags'''
+  ./mdv.py:279:    # @TODO, try to avoid formatting and then unformatting u_u;
+  ./mdv.py:318:    # @TOFIX, I still get logging levels backward it seems.
+  ./config.py:5:# @TODO, these should be methods
+  ./config.py:32:# @TODO: avoid single letter, or fixed meaning color nams
+
+** DONE decouple and generalized `seek`
+
+   seek is two independant parts:
+    - human interface argument parsing
+    - actual seeking

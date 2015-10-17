@@ -1,6 +1,7 @@
 import os
 import re
 import sys
+import itertools as it
 from functools import reduce
 from markdown.util import etree
 if sys.version_info.major == '2':
@@ -68,3 +69,43 @@ def innerhtml(el):
 
 def remove_left_indent(s):
     return re.sub(r'[\n\r]\s+', '\n', s)
+
+
+def countdown(n):
+    c = 0
+    def _(e):
+        nonlocal c
+        if c == n:
+            return False
+        else:
+            c += 1
+            return True
+    return _
+
+
+def yes(*_):
+    return True
+
+
+def slyce(text, beg=yes, end=countdown(1)):
+    '''text -> beg -> end -> new text
+    return text from `beg` in text
+    '''
+    lines = text.splitlines()
+    lines = it.dropwhile(beg, lines)
+    lines = it.takewhile(end, lines)
+    return '\n'.join(lines)
+
+
+def slice(text, match='', after=1):
+    '''text -> beg -> end -> new text
+    return text from `beg` in text
+    '''
+    if match in text:
+        lines = text.splitlines()
+        lines = it.dropwhile(lambda l: match not in l, lines)
+        lines = list(lines)[:after]
+        return '\n'.join(lines)
+    else:
+        lines = text.splitlines()[:after]
+        return '\n'.join(lines)

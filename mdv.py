@@ -79,7 +79,6 @@ from __future__ import print_function  # python 2 compatibility ...
 import re
 import sys
 import logging
-import itertools as it
 
 import markdown
 from markdown.extensions import fenced_code
@@ -94,7 +93,7 @@ except ImportError:
 
 from vendor.docopt import docopt
 
-from mdv.core.helpers import j
+from mdv.core.helpers import j, slyce, countdown
 
 from mdv.core.sample import make_sample
 from mdv.core.term import Term
@@ -237,40 +236,25 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # ------------------------------------------------------------------------ Seek
 
-    # seek :: text -> string-to-match -> lines-after-match -> text'
-
-    def seek(text, position):
-        '''text -> (match:str, after:int) -> new text
-        seek for `match` in text, return text lines `after` that point
-        '''
-        def parse(position):
-            '''@TOFIX, avoid parsing by using two docopt flags'''
-            fmt = '^(?P<match>[^:]+):(?P<lines>.*)$'
-            m = re.match(fmt, position)
-            if m:
-                d = m.groupdict()
-                match = d.get('match')
-                lines = int(d.get('lines'))
-                return True, match, lines
-            else:
-                err = 'position format must be `<string>:<lines>`, not `{pos}`'
-                mdv.warn(err.format(pos=position))
-                return False, None, None
-
-        check, match, after = parse(position)
-        if not check:
-            return text
-        elif match in text:
-            lines = text.splitlines()
-            lines = it.dropwhile(lambda l: match not in l, lines)
-            lines = list(lines)[:after]
-            return '\n'.join(lines)
+    def parse(position):
+        '''@TOFIX, avoid parsing by using two docopt flags'''
+        fmt = '^(?P<match>[^:]+):(?P<lines>.*)$'
+        m = re.match(fmt, position)
+        if m:
+            d = m.groupdict()
+            match = d.get('match')
+            lines = int(d.get('lines'))
+            return match, lines
         else:
-            lines = text.splitlines()[:after]
-            return '\n'.join(lines)
+            err = 'position format must be `<string>:<lines>`, not `{pos}`'
+            mdv.warn(err.format(pos=position))
+            return None, None
 
-    mdv.info('seeking from ' + (from_txt if from_txt else 'start'))
-    ansi = seek(ansi, from_txt) if from_txt else ansi
+    if from_txt:
+        match, after = parse(from_txt)
+        if match and after:
+            mdv.info('seeking from ' + from_txt)
+            ansi = slyce(ansi, lambda l: match not in l, countdown(after))
 
 # ------------------------------------------------------------------------ Wat?
 
