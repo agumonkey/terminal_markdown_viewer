@@ -200,26 +200,24 @@ def main(md=None, filename=None, cols=None, theme=None, c_theme=None, bg=None,
 
 # ------------------------------------------------------------------- ANSI PASS
 
-    the_html = MD.convert(md)
+    # necessary to generate MD.ansi (through AnsiPrintExtension)
+    html = MD.convert(md)
 
     mdv.debug('[html]')
-    mdv.debug(the_html)
+    mdv.debug(html)
 
     if do_html:
-        return the_html
+        return html
 
     # who wants html, here is our result:
     try:
         ansi = MD.ansi
     except Exception as exn:
-
-        # mdv.warn('[markdown.ansi] {exn}'.format(exn=exn))
         mdv.debug('[markdown.ansi] {exn} {md}'.format(exn=exn, md=dir(MD)))
-
         if do_html:
             # can this happen? At least show:
             mdv.debug("we have markdown result but no ansi.")
-            mdv.debug(the_html)
+            mdv.debug(html)
         else:
             ansi = 'n.a. (no parsing result)'
 
